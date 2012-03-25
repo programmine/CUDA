@@ -9,145 +9,126 @@ class TriangleList;
 #include <vector>
 
 /**
- * Die Wasseroberflaeche.
+ * Water surface
  *
- * Erzeugt realistische Wellenbewegung und Spiegelung der Umgebung.
- * Die WaterPlane ist ein Singleton.
+ * This class uses the functionality of the WaveMap to generate a surface mesh
+ * The class is a singleton.
  *
  */
 class WaterPlane
 {
 public:
 	/**
-	 * Erzeugt den naechsten Wellenzustand.
+	 * creates the next wave state
 	 */
 	void update(void);
 
 	/**
-	 * Gibt die WaterPlane zurck.
+	 * returns instance of waterplane
 	 */
 	static WaterPlane* getWaterPlane();
 
 	/**
-	 * Zeichnet das Mesh der Wasseroberflaeche.
+	 * draws the mesh of the water plane
 	 */
 	void drawMesh(void);
 
 	/**
 	 *
-	 * Initialisiert die WaterPlane. 
+	 * Initialises the water plane
 	 * 
-	 * @param dampFactor Ausdehnung der erzeugten Wellen
-	 * @param resolution beschreibt wieviel Gitternetzpunkte pro Laengeneinheit erzeugt werden
+	 * @param dampFactor expansion of the created waves
+	 * @param resolution describes how many grid points are created per scaling unit
 	 * 
 	 */
 	void configure(Vector upperLeft, Vector lowerRight, float dampFactor, float resolution);
 
 	/**
-	 * Stoert die WaterPlane.
+	 * method to disturb one point of surface.
 	 *
-	 * @param disturbingPoint Punkt an dem die Waterplane gestoert werden soll.
+	 * @param disturbingPoint one point to disturb surface.
 	 * 
 	 */
 	void disturb(Vector disturbingPoint);
 
+	/**
+	 * method to disturb circular area of surface.
+	 *
+	 * @param xmin lower x value of aquare which contain circular area to disturb surface
+	 * @param zmin lower z value of aquare which contain circular area to disturb surface
+	 * @param xmax higher x value of aquare which contain circular area to disturb surface
+	 * @param zmax higher z value of aquare which contain circular area to disturb surface
+	 * @param height defines how heigh/low the circular area is pushed
+	 * 
+	 */
 	void disturbArea(float xmin, float zmin, float xmax, float zmax, float height);
 
 	/**
-	 * Stoert die WaterPlane am spezifizierten Punkt.
-	 */
-	void disturb(float x, float y, float z);
-
-	/**
-	 * Fgt einen Punkt zu der Liste der automatisch gestoerten Punkte hinzu, 
-	 * um ein realistischen Effekt zu erzielen werden auch die direkten Nachbarn 
-	 * des Punktes gestoert.Fgt einen Punkt hinzu, der von der WaterPlane automatisch gestoert werden soll.
-	 */
-	void appendDisturbedPoint(Vector point);
-
-	void clear();
-
+	*
+	* show/hide triangle edges of mesh
+	*
+	**/
 	void toggleEdges();
-
-	void toggleNormals();
 
 	~WaterPlane(void);
 
 private:
 
 	/**
-	 * Standard Konstruktor
+	 * Standard constructor
 	 */
 	WaterPlane();
 
 	/**
-	 * Das WaterPlane Exemplar
+	 * The WaterPlane Instance
 	 */
 	static WaterPlane* WaterPlaneExemplar;
 
 	/** 
-	 * Vertauscht die Rollen der beiden Buffer fuer den alten und neuen Wellenzustand.
+	 * Swaps the roles of the two buffers between old and new wave state
 	 */
 	void swapBuffers(void);
 
 	/**
-	 * Setzt den Hoehenwert an Stelle (x,y) auf depth.
+	 * Sets the height value of the given x,y (x,z) to the given depth
 	 */
 	void push(float x, float y, float depth);
 
 	/**
-	 * Initialisiert die benoetigten Datenstrukturen.
+	 * initialises the basic data structure
 	 */
 	void initBuffer(void);
 
 	/**
-	 * Zeichnet die Environment - Map.
-	 */
-	void drawEnvironmentMap(void);
-
-	/**
-	 * Die Waterplpane stoert sich selbst an definierten Punkten 
-	 * um eine staendige Wasserbewegung zu simulieren.
-	 */
-	void motion(void);
-
-	/**
-	 * Die Hoehe des Punktes an der Stelle (x,y).
+	 * height on the position (x,y).
 	 */
 	int getHeight(int x, int y);
 
 	/**
-	 * Errechnet zu einer X - Koordinate aus dem Weltkoordinatensystem 
-	 * den zugehoerigen Punkt in der Wasseroberflaeche.
+	 * calculates the water surface x point from the world coordinates of realX
 	 */
 	unsigned int getWaterPlaneX(float realX);
 
 	/**
-	 * Errechnet zu einer Y - Koordinate aus dem Weltkoordinatensystem 
-	 * den zugehoerigen Punkt in der Wasseroberflaeche.
+	 * calculates the water surface point y from the world coordinates of realY
 	 */
 	unsigned int getWaterPlaneY(float realY);
 
-	void setupDataStructure(void);
+	/**
+	 * creates triangle data structure of surface mesh
+	 */
+	void setupTriangleDataStructure(void);
 
+	//resolution factor
 	float resolutionFactor;
 
-	//Vertices der Wasseroberflaeche
+	//Vertices of the surface mesh
 	std::vector<Vector*> vertices;
 
-	//Die Normalen zu den Vertices
-	std::vector<Vector*> vNormals;
-
-	//Liste der automatisch gestoerten Punkte
-	std::vector<Vector*> disturbedPoints;
 	/** 
-	 * Diese Datenstruktuer speichert die Hoehenwerte zum aktuellen Zustand
+	 * data structure (buffers) for wave creation
 	 */
 	WaveMap* waveMap;
-
-	bool doMotion;
-
-	double startTime;
 
 	Vector uLeft;
 
@@ -161,19 +142,13 @@ private:
 
 	unsigned int sizeY;
 
-	unsigned int currentDisturbedPoint;
-
 	float stepSize;
 
 	float baseHeight;
 
-	double elapsedTime;
-
 	TriangleList *triangles;
 
 	bool showEdges;
-
-	bool calcNormals;
 };
 
 #endif

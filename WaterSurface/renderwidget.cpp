@@ -27,8 +27,8 @@ RenderWidget::RenderWidget(QWidget * parent)
 	previousTime = 0;
 	fps = 0.0f;
 
-	radius = 5.0f;	
-	theta  = (3.0f * M_PI) / 2.0f;
+	radius = 4.0f;	
+	theta  = (2.8f * M_PI) / 2.0f;
 	phi = M_PI/1.2f;
 
 	disturbAreaMin = 1.30f;
@@ -191,6 +191,11 @@ void RenderWidget::mousePressEvent(QMouseEvent *event)
 	mouseDisturbSurface(lastPos);
 }
 
+void RenderWidget::resetWaterPlane()
+{
+	waterplane->configure(Vector(0,0,0),Vector(surfaceSize,0,surfaceSize),damping,resolution);
+}
+
 void RenderWidget::keyPressEvent (QKeyEvent * event)
 {
 	if (event->key()==Qt::Key_Space)
@@ -205,11 +210,12 @@ void RenderWidget::keyPressEvent (QKeyEvent * event)
 	{
 		waterplane->toggleEdges();
 	}
-	else if (event->key()==Qt::Key_N)
-	{
-		waterplane->toggleNormals();
-	}
 
+}
+
+void RenderWidget::toggleEdges()
+{
+	waterplane->toggleEdges();
 }
 
 void RenderWidget::render()
@@ -294,7 +300,6 @@ void RenderWidget::paintGL()
 	glTranslatef(surfaceSize/2.0,0,surfaceSize/2.0);
 
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-	drawAxis();
 	drawFPS();
 	update();
 }

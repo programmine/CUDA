@@ -14,6 +14,8 @@ public:
 	RenderWidget(QWidget * parent = 0);
 	~RenderWidget(void);
 	void changeWaveSettings(float waveSize, float waveIntensity);
+	void resetWaterPlane();
+	void toggleEdges();
 
 protected:
 	void initializeGL(); 

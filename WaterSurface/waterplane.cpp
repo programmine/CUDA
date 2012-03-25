@@ -12,9 +12,7 @@
 WaterPlane* WaterPlane::WaterPlaneExemplar = 0;
 
 WaterPlane::WaterPlane(){
-	elapsedTime = 0.0;
 	showEdges=false;
-	calcNormals=true;
 }
 
 // Singleton
@@ -31,26 +29,9 @@ void WaterPlane::toggleEdges(){
 	showEdges=!showEdges;
 }
 
-void WaterPlane::toggleNormals(){
-
-	calcNormals=!calcNormals;
-	if (calcNormals) return;
-	int vIndex=0;
-	for (unsigned int x = 0; x< pointsX ; x++){
-
-		for (unsigned int y = 0; y < pointsY; y++){
-
-			vIndex = (y * pointsX) + x;
-			Vector *v = vertices.at(vIndex);
-			v->setNormal(0,1,0);
-		}
-	}
-}
-
 
 void WaterPlane::configure(Vector upperLeft, Vector lowerRight, float dampFactor, float resolution)
 {
-	doMotion = false;
 
 	stepSize = 1.0/resolution;
 
@@ -82,23 +63,12 @@ void WaterPlane::configure(Vector upperLeft, Vector lowerRight, float dampFactor
 
 	initBuffer();
 
-	setupDataStructure();
-
-	drawEnvironmentMap();
+	setupTriangleDataStructure();
 
 	drawMesh();
-
-	currentDisturbedPoint = 0;
-
-	startTime = 0;
 }
 
-void WaterPlane::clear()
-{
-	initBuffer();
-}
-
-void WaterPlane::setupDataStructure()
+void WaterPlane::setupTriangleDataStructure()
 {
 	bool odd = false;
 	if (pointsY % 2 ==1) odd=true;
@@ -142,7 +112,6 @@ void WaterPlane::setupDataStructure()
 void WaterPlane::initBuffer()
 {
 	vertices.clear();
-	vNormals.clear();
 
 	//Start und Endkoordinaten für x-Richtung
 	float startX = this->uLeft.get(0);
@@ -164,29 +133,8 @@ void WaterPlane::initBuffer()
 			vertices.push_back(v);
 		}
 	}
-
-	//Liste für die Punkte die von der Wasseroberfläche automatisch gestört werden sollen
-	disturbedPoints.clear();
 }
 
-void WaterPlane::appendDisturbedPoint(Vector point)
-{
-	float x = point.get(0);
-	float y = point.get(1);
-	float z = point.get(2);
-
-	disturbedPoints.push_back(new Vector(x-1.0, y, z-1.0));
-	disturbedPoints.push_back(new Vector(x+1.0, y, z-1.0));
-	disturbedPoints.push_back(new Vector(x-1.0, y, z+1.0));
-	disturbedPoints.push_back(new Vector(x+1.0, y, z+1.0));
-
-	disturbedPoints.push_back(new Vector(x, y, z));
-
-	disturbedPoints.push_back(new Vector(x-1.0, y, z));
-	disturbedPoints.push_back(new Vector(x+1.0, y, z));
-	disturbedPoints.push_back(new Vector(x, y, z+1.0));
-	disturbedPoints.push_back(new Vector(x, y, z+1.0));
-}
 
 void WaterPlane::disturb(Vector disturbingPoint)
 {
@@ -224,17 +172,6 @@ void WaterPlane::disturbArea(float xmin, float zmin, float xmax, float zmax, flo
 	}
 }
 
-
-void WaterPlane::disturb(float x, float y, float z)
-{
-	float value = y;
-
-	float py = x;
-	float px = z;
-	float h = value;
-
-	this->push(px, py, h);
-}
 
 void WaterPlane::push(float x, float y, float depth)
 {
@@ -307,26 +244,23 @@ void WaterPlane::update()
 		}
 	}
 
-	if (calcNormals)
-	{
-		for (unsigned int x = 0; x< pointsX ; x++){
+	for (unsigned int x = 0; x< pointsX ; x++){
 
-			for (unsigned int y = 0; y < pointsY; y++){
+		for (unsigned int y = 0; y < pointsY; y++){
 
-				vIndex = (y * pointsX) + x;
-				Vector *v = vertices.at(vIndex);
+			vIndex = (y * pointsX) + x;
+			Vector *v = vertices.at(vIndex);
 
-				std::vector<Triangle*> neighbourTr = triangles->GetNeighbourTriangles(v);
+			std::vector<Triangle*> neighbourTr = triangles->GetNeighbourTriangles(v);
 
-				Vector *normal = new Vector(0,0,0);
-				for (int triangleIndex = 0; triangleIndex < neighbourTr.size(); triangleIndex++)
-				{
-					Triangle *tr = neighbourTr.at(triangleIndex);
-					*normal = *normal + *(tr->UpdateNormal());
-				}
-				Vector normalizedNormal = Vector::Normalize(*normal);
-				v->setNormal(normalizedNormal.get(0),normalizedNormal.get(1),normalizedNormal.get(2));
+			Vector *normal = new Vector(0,0,0);
+			for (int triangleIndex = 0; triangleIndex < neighbourTr.size(); triangleIndex++)
+			{
+				Triangle *tr = neighbourTr.at(triangleIndex);
+				*normal = *normal + *(tr->UpdateNormal());
 			}
+			Vector normalizedNormal = Vector::Normalize(*normal);
+			v->setNormal(normalizedNormal.get(0),normalizedNormal.get(1),normalizedNormal.get(2));
 		}
 	}
 }
@@ -378,14 +312,7 @@ void WaterPlane::drawMesh()
 	}
 }
 
-void WaterPlane::drawEnvironmentMap()
-{
-	
-}
 
-
-void WaterPlane::motion(){
-}
 
 
 //Destructor

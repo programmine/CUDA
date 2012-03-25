@@ -16,7 +16,10 @@ public:
 	~WaterSurface();
 
 protected slots:
-	void changeWaveSettings();
+	void changeWaveSettingsSize(double);
+	void changeWaveSettingsIntens(double);
+	void resetWaveSettings();
+	void toggleEdges(int);
 
 private:
 	RenderWidget *renderWidget; 
