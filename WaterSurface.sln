@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WaterSurface", "WaterSurface\WaterSurface.vcproj", "{DE8D51B5-1256-4192-A064-B3BC5D1E11B7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE8D51B5-1256-4192-A064-B3BC5D1E11B7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DE8D51B5-1256-4192-A064-B3BC5D1E11B7}.Debug|Win32.Build.0 = Debug|Win32
+		{DE8D51B5-1256-4192-A064-B3BC5D1E11B7}.Release|Win32.ActiveCfg = Release|Win32
+		{DE8D51B5-1256-4192-A064-B3BC5D1E11B7}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
