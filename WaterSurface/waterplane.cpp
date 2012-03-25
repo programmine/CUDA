@@ -378,50 +378,6 @@ void WaterPlane::drawMesh()
 	}
 }
 
-void WaterPlane::drawMeshFans()
-{
-
-}
-
-void WaterPlane::drawMeshStrips()
-{
-	for (unsigned int i=0; i < (pointsY*(pointsX-1));i++)
-	{
-		if (i % pointsY == 0)
-		{
-			glBegin(GL_TRIANGLE_STRIP);
-			Vector *x = vertices.at(i);
-			Vector *x3 = vertices.at(i+1);
-			Vector *x2 = vertices.at(i+pointsY);
-			glVertex3f(x->get(0),x->get(1),x->get(2));
-			glVertex3f(x2->get(0),x2->get(1),x2->get(2));
-			glVertex3f(x3->get(0),x3->get(1),x3->get(2));
-			//glVertex3f(x4.get(0),x4.get(1),x4.get(2));
-		} 
-		else if ((i+1) % pointsY == 0)
-		{
-			Vector *x2 = vertices.at(i);
-			Vector *x3 = vertices.at(i+pointsY);
-			glVertex3f(x2->get(0),x2->get(1),x2->get(2));
-			glVertex3f(x3->get(0),x3->get(1),x3->get(2));
-			glEnd();
-		}
-		else if ((i-1) % pointsY == 0)
-		{
-			Vector *x = vertices.at(i+pointsY);
-			glVertex3f(x->get(0),x->get(1),x->get(2));
-		}
-		else
-		{
-			Vector *x2 = vertices.at(i);
-			Vector *x3 = vertices.at(i+pointsY);
-			glVertex3f(x2->get(0),x2->get(1),x2->get(2));
-			glVertex3f(x3->get(0),x3->get(1),x3->get(2));
-		}
-
-	}
-}
-
 void WaterPlane::drawEnvironmentMap()
 {
 	

@@ -128,8 +128,6 @@ private:
 	 */
 	unsigned int getWaterPlaneY(float realY);
 
-	void drawMeshStrips(void);
-	void drawMeshFans(void);
 	void setupDataStructure(void);
 
 	float resolutionFactor;
