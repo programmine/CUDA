@@ -72,7 +72,7 @@ public:
 
 	~WaterPlane(void);
 
-private:
+protected:
 
 	/**
 	 * Standard constructor

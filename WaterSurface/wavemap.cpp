@@ -14,8 +14,6 @@ WaveMap::WaveMap(unsigned int pX, unsigned int pY, float damp)
 	this->pointsX = pX;
 
 	this->pointsY = pY;
-
-	//this->print();
 }
 
 float WaveMap::getHeight(unsigned int x, unsigned int y)
@@ -92,12 +90,10 @@ int WaveMap::getPointsY()
 	return this->pointsY;
 }
 
-void WaveMap::print()
-{
-	oldWave->printMatrix();
 
-	std::cout<<std::endl;
-
-	newWave->printMatrix();
+WaveMap::~WaveMap(void){
+	delete tmp;
+	delete oldWave;
+	delete newWave;
 }
 

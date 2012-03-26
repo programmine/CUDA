@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TRIANGLELIST_H
+#define TRIANGLELIST_H
 
 #include <vector>
 #include <map>
@@ -17,8 +18,9 @@ public:
 	std::vector<Triangle*> GetNeighbourTriangles(Vector *v);
 
 
-private:
+protected:
 	std::vector<Triangle*> triangles;
 	std::map<Vector*,std::vector<Triangle*>> neighbourTriangles;
 
 };
+#endif

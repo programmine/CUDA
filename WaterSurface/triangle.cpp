@@ -17,6 +17,9 @@ Triangle::Triangle(Vector *p1,Vector *p2,Vector *p3)
 
 Triangle::~Triangle(void)
 {
+	delete Point1;
+	delete Point2;
+	delete Point3;
 }
 
 Vector* Triangle::UpdateNormal()

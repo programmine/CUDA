@@ -316,5 +316,13 @@ void WaterPlane::drawMesh()
 
 
 //Destructor
-WaterPlane::~WaterPlane(void){}
+WaterPlane::~WaterPlane(void){
+	for (unsigned int i = 0; i < vertices.size(); i++){
+
+		delete vertices.at(i);
+	}
+	vertices.clear();
+	delete waveMap;
+	delete triangles;
+}
 

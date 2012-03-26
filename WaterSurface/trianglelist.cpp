@@ -10,6 +10,11 @@ TriangleList::TriangleList(void)
 
 TriangleList::~TriangleList(void)
 {
+	for (int index=0;index<triangles.size();index++)
+	{
+		delete triangles.at(index);
+	}
+	triangles.clear();
 }
 
 

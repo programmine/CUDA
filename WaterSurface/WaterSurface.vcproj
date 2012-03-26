@@ -190,11 +190,23 @@
 					>
 				</File>
 				<File
+					RelativePath=".\trianglelistCUDA.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\waterplane.cpp"
 					>
 				</File>
 				<File
+					RelativePath=".\waterplaneCUDA.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\wavemap.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\wavemapCUDA.cpp"
 					>
 				</File>
 				<File
@@ -276,11 +288,23 @@
 					>
 				</File>
 				<File
+					RelativePath=".\trianglelistCUDA.h"
+					>
+				</File>
+				<File
 					RelativePath=".\waterplane.h"
 					>
 				</File>
 				<File
+					RelativePath=".\waterplaneCUDA.h"
+					>
+				</File>
+				<File
 					RelativePath=".\wavemap.h"
+					>
+				</File>
+				<File
+					RelativePath=".\wavemapCUDA.h"
 					>
 				</File>
 				<File

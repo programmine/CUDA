@@ -52,9 +52,9 @@ public:
 	 */
 	float getHeight(unsigned int x, unsigned int y);
 
-	void print(void);
+	~WaveMap(void);
 
-private:
+protected:
 
 	WMatrix* tmp;
 	WMatrix* oldWave;

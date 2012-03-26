@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TRIANGLE_H
+#define TRIANGLE_H
 #include "vector.h"
 
 class Triangle
@@ -14,3 +15,4 @@ public:
 	Vector* Normal;
 	bool IsAdjacentVector(Vector *v);
 };
+#endif
