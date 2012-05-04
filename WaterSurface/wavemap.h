@@ -35,7 +35,7 @@ public:
 	/**
 	 * Berechnet die aktuelle Höhenfledbelegung
 	 */
-	void updateWaveMap();
+	virtual void updateWaveMap();
 
 	/**
 	 * Anzahl der Punkte in X - Richtung
@@ -52,7 +52,7 @@ public:
 	 */
 	float getHeight(unsigned int x, unsigned int y);
 
-	~WaveMap(void);
+	virtual ~WaveMap(void);
 
 protected:
 

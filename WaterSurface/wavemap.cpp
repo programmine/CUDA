@@ -28,7 +28,6 @@ void WaveMap::push(unsigned int x, unsigned int y, float value)
 
 void WaveMap::updateWaveMap()
 {
-
 	float n = 0.0;
 
 	/* Skip the edges to allow area sampling*/
@@ -66,6 +65,7 @@ void WaveMap::updateWaveMap()
 			newWave->setElement(x, y, n);
 		}
 	}
+	
 	this->swap();
 	//this->print();
 }
@@ -94,6 +94,5 @@ int WaveMap::getPointsY()
 WaveMap::~WaveMap(void){
 	delete tmp;
 	delete oldWave;
-	delete newWave;
 }
 

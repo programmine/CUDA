@@ -78,5 +78,5 @@ void WaterSurface::toggleEdges(int state)
 
 WaterSurface::~WaterSurface()
 {
-
+	delete renderWidget;
 }

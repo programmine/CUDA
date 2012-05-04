@@ -13,14 +13,26 @@ class WMatrix;
  * um auf von diesem Zustand ausgehend die neue Belegung der Höhenfelder 
  * zu berechnen. Für den nächsten Schritt tauschen die Buffer die Rollen.
  */
-class WaveMapCUDA : WaveMap
+class WaveMapCUDA : public WaveMap
 {
 public:
 
+	WaveMapCUDA(unsigned int pX, unsigned int pY, float damp);
 	/**
 	 * Berechnet die aktuelle Höhenfledbelegung
 	 */
-	void updateWaveMap();
+	virtual void updateWaveMap();
+
+	virtual ~WaveMapCUDA(void);
+
+private:
+	float* dev_oldWave;
+	float* dev_newWave;
+	unsigned int *rowSize;
+	unsigned int *arraySize;
+	unsigned int *dev_arraySize;
+	float* From2DTo1D(float** array2D, unsigned int size, float* array1D);
+	float** From1DTo2D(float* array1D, unsigned int size, float** array2D);
 
 };
 #endif

@@ -21,7 +21,7 @@ public:
 	/**
 	 * creates the next wave state
 	 */
-	void update(void);
+	virtual void update(void);
 
 	/**
 	 * returns instance of waterplane
@@ -31,7 +31,7 @@ public:
 	/**
 	 * draws the mesh of the water plane
 	 */
-	void drawMesh(void);
+	virtual void drawMesh(void);
 
 	/**
 	 *
@@ -41,7 +41,7 @@ public:
 	 * @param resolution describes how many grid points are created per scaling unit
 	 * 
 	 */
-	void configure(Vector upperLeft, Vector lowerRight, float dampFactor, float resolution);
+	virtual void configure(Vector upperLeft, Vector lowerRight, float dampFactor, float resolution);
 
 	/**
 	 * method to disturb one point of surface.

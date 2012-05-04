@@ -1,7 +1,7 @@
-#include "waterplane.h"
-#include "wavemap.h"
+#include "waterplaneCUDA.h"
+#include "wavemapCUDA.h"
 #include "vector.h"
-#include "trianglelist.h"
+#include "trianglelistCUDA.h"
 #include "triangle.h"
 #include <windows.h>
 #include <GL/gl.h>
@@ -322,7 +322,8 @@ WaterPlane::~WaterPlane(void){
 		delete vertices.at(i);
 	}
 	vertices.clear();
-	delete waveMap;
 	delete triangles;
+	delete waveMap;
+	
 }
 

@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 
 #include "renderwidget.h"
+#include "waterplaneCUDA.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
@@ -47,6 +48,7 @@ RenderWidget::RenderWidget(QWidget * parent)
 RenderWidget::~RenderWidget(void)
 {
 	makeCurrent(); 
+	delete waterplane;
 }
 
 void RenderWidget::changeWaveSettings(float waveSize, float waveIntensity){
@@ -309,7 +311,7 @@ void RenderWidget::initializeGL()
 {
 	glEnable(GL_DEPTH_TEST);
 	initializeLights();
-	waterplane=WaterPlane::getWaterPlane();
+	waterplane=WaterPlaneCUDA::getWaterPlane();
 	waterplane->configure(Vector(0,0,0),Vector(surfaceSize,0,surfaceSize),damping,resolution);
 	waterplane->update();
 }

@@ -1,20 +1,34 @@
-#include "trianglelist.h"
-#include "triangle.h"
 #include <iostream> 
 #include <algorithm>
+#include "trianglelist.h"
+#include "triangle.h"
+
 
 TriangleList::TriangleList(void)
 {
 	triangles.clear();
 }
 
+template <class C> void FreeClear( C & cntr ) {
+	for ( typename C::iterator it = cntr.begin(); 
+		it != cntr.end(); ++it ) {
+			delete * it;
+	}
+	cntr.clear();
+}
+
+
 TriangleList::~TriangleList(void)
 {
-	for (int index=0;index<triangles.size();index++)
-	{
-		delete triangles.at(index);
-	}
+	/* Fill vector here */
 	triangles.clear();
+
+	//for (int index=0;index<triangles.size();index++)
+	//{
+	//	delete triangles.at(index);
+	//}
+	//triangles.clear();
+	//FreeClear(triangles);
 }
 
 

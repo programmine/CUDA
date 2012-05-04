@@ -8,7 +8,7 @@ class Triangle;
 class Vector;
 #include "trianglelist.h"
 
-class TriangleListCUDA : TriangleList
+class TriangleListCUDA : public TriangleList
 {
 public:
 	void AddTriangle(Triangle *tr, int compareTriangles);

@@ -42,12 +42,13 @@ public:
 
 public:
 	~WMatrix(void);
+	float** Values;
 
 private:
 	unsigned int rowCount;
 	unsigned int columnCount;
 
-	float** values;
+	
 };
 
 #endif

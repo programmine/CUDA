@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="WaterSurface"
 	ProjectGUID="{DE8D51B5-1256-4192-A064-B3BC5D1E11B7}"
+	RootNamespace="WaterSurface"
 	Keyword="Qt4VSv1.0"
 	TargetFrameworkVersion="0"
 	>
@@ -13,6 +14,12 @@
 		/>
 	</Platforms>
 	<ToolFiles>
+		<DefaultToolFile
+			FileName="NvCudaDriverApi.rules"
+		/>
+		<DefaultToolFile
+			FileName="NvCudaRuntimeApi.rules"
+		/>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
@@ -25,7 +32,15 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="Driver API Build Rule"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="Cudart Build Rule"
+				AdditionalOptions=""
+				Runtime="3"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -55,9 +70,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib glu32.lib cudart.lib cuda.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
-				AdditionalLibraryDirectories="$(QTDIR)\lib"
+				LinkIncremental="0"
+				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 			/>
@@ -88,12 +104,21 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)"
 			ConfigurationType="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
+				Name="Driver API Build Rule"
+			/>
+			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="Cudart Build Rule"
+				Warning="1"
+				Optimization="0"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -108,9 +133,13 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;.\GeneratedFiles&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;.\&quot;;&quot;$(QTDIR)\include\QtOpenGL&quot;"
-				PreprocessorDefinitions=",UNICODE,WIN32,QT_LARGEFILE_SUPPORT;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB"
-				RuntimeLibrary="3"
+				PreprocessorDefinitions="UNICODE;WIN32;QT_LARGEFILE_SUPPORT;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;_DEBUG;_CONSOLE"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="1"
 				TreatWChar_tAsBuiltInType="false"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -125,11 +154,17 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="qtmaind.lib QtCored4.lib QtGuid4.lib QtOpenGLd4.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib glu32.lib cudart.lib cuda.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
-				AdditionalLibraryDirectories="$(QTDIR)\lib"
+				LinkIncremental="0"
+				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;"
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames="libcpmt.lib;libcmt.lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -162,6 +197,22 @@
 			Filter="cpp;cxx;c;def"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath=".\GPUFunctions.cu"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="Cudart Build Rule"
+						Runtime="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\GPUFunctions.cuh"
+				>
+			</File>
 			<File
 				RelativePath=".\main.cpp"
 				>
@@ -240,7 +291,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing $(InputFileName)..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I.&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -D_DEBUG -D_CONSOLE  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I.&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;.\renderwidget.h&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
@@ -270,7 +321,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing $(InputFileName)..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I.&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;.\watersurface.h&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -D_DEBUG -D_CONSOLE  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I.&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;.\watersurface.h&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>

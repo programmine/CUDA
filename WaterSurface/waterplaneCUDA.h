@@ -16,13 +16,13 @@ class TriangleList;
  * The class is a singleton.
  *
  */
-class WaterPlaneCUDA : WaterPlane
+class WaterPlaneCUDA : public WaterPlane
 {
 public:
 	/**
 	 * creates the next wave state
 	 */
-	void update(void);
+	virtual void update(void);
 
 	/**
 	 * returns instance of WaterPlaneCUDA
@@ -37,7 +37,7 @@ public:
 	 * @param resolution describes how many grid points are created per scaling unit
 	 * 
 	 */
-	void configure(Vector upperLeft, Vector lowerRight, float dampFactor, float resolution);
+	virtual void configure(Vector upperLeft, Vector lowerRight, float dampFactor, float resolution);
 
 protected:
 

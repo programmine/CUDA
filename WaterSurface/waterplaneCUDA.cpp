@@ -1,7 +1,7 @@
 #include "waterplaneCUDA.h"
-#include "wavemap.h"
+#include "wavemapCUDA.h"
 #include "vector.h"
-#include "trianglelist.h"
+#include "trianglelistCUDA.h"
 #include "triangle.h"
 #include <windows.h>
 #include <GL/gl.h>
@@ -45,10 +45,10 @@ void WaterPlaneCUDA::configure(Vector upperLeft, Vector lowerRight, float dampFa
 	//Der "Meeresspiegel"
 	baseHeight = lRight.get(1);
 
-	triangles = new TriangleList();
+	triangles = new TriangleListCUDA();
 
 	//Das Höhenfeld der WaterPlaneCUDA
-	waveMap = new WaveMap(pointsX, pointsY, dampFactor);
+	waveMap = new WaveMapCUDA(pointsX, pointsY, dampFactor);
 
 	initBuffer();
 
