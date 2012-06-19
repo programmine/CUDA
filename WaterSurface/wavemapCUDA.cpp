@@ -62,6 +62,7 @@ WaveMapCUDA::WaveMapCUDA(unsigned int pX, unsigned int pY, float damp):WaveMap(p
 	cutilSafeCall(cudaMalloc((void**)&dev_oldWave,pY*pY*sizeof(float)));
 	cutilSafeCall(cudaMalloc((void**)&dev_newWave,pY*pY*sizeof(float)));
 	cutilSafeCall(cudaMalloc((void**)&dev_arraySize,sizeof(unsigned int)));
+	cutilSafeCall(cudaMalloc((void**)&dev_arrayDIM,sizeof(unsigned int)));
 	
 }
 
@@ -90,6 +91,7 @@ float** WaveMapCUDA::From1DTo2D(float* array1D, unsigned int size, float** array
 
 void WaveMapCUDA::updateWaveMap()
 {
+
 	float* dev_newWave2 = new float[*arraySize]();
 	float* dev_oldWave2 = new float[*arraySize]();
 	From2DTo1D(newWave->Values,*rowSize, dev_newWave2);
@@ -97,10 +99,10 @@ void WaveMapCUDA::updateWaveMap()
 	cutilSafeCall(cudaMemcpy(dev_newWave,dev_newWave2,(*arraySize)*sizeof(float),cudaMemcpyHostToDevice));
 	cutilSafeCall(cudaMemcpy(dev_oldWave,dev_oldWave2,(*arraySize)*sizeof(float),cudaMemcpyHostToDevice));
 	cutilSafeCall(cudaMemcpy(dev_arraySize,this->arraySize,sizeof(unsigned int),cudaMemcpyHostToDevice));
-	updateWaveMapGPU1(dev_newWave,dev_oldWave, dev_arraySize);
+	cutilSafeCall(cudaMemcpy(dev_arrayDIM,this->rowSize,sizeof(unsigned int),cudaMemcpyHostToDevice));
+	updateWaveMapGPU1(dev_newWave,dev_oldWave, dev_arraySize, dev_arrayDIM);
 	cutilSafeCall(cudaMemcpy(dev_newWave2,dev_newWave,(*arraySize)*sizeof(float),cudaMemcpyDeviceToHost));
 	cutilSafeCall(cudaMemcpy(dev_oldWave2,dev_oldWave,(*arraySize)*sizeof(float),cudaMemcpyDeviceToHost));
-	cutilSafeCall(cudaMemcpy(arraySize,dev_arraySize,sizeof(unsigned int),cudaMemcpyDeviceToHost));
 	From1DTo2D(dev_newWave2,*rowSize, newWave->Values);
 	From1DTo2D(dev_oldWave2,*rowSize, oldWave->Values);
 	this->swap();
@@ -111,6 +113,7 @@ WaveMapCUDA::~WaveMapCUDA(){
 	cudaFree(dev_newWave);
 	cudaFree(dev_oldWave);
 	cudaFree(dev_arraySize);
+	cudaFree(dev_arrayDIM);
 }
 
 

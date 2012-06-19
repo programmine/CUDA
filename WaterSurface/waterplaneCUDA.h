@@ -8,6 +8,7 @@ class TriangleList;
 #include "vector.h"
 #include "waterplane.h"
 #include <vector>
+#include <cutil_inline.h>
 
 /**
  * Water surface
@@ -29,18 +30,12 @@ public:
 	 */
 	static WaterPlane* getWaterPlane();
 
-	/**
-	 *
-	 * Initialises the water plane
-	 * 
-	 * @param dampFactor expansion of the created waves
-	 * @param resolution describes how many grid points are created per scaling unit
-	 * 
-	 */
 	virtual void configure(Vector upperLeft, Vector lowerRight, float dampFactor, float resolution);
 
-protected:
+	virtual ~WaterPlaneCUDA(void);
 
+protected:
+	WaterPlaneCUDA();
 	/**
 	 * initialises the basic data structure
 	 */
@@ -50,6 +45,16 @@ protected:
 	 * creates triangle data structure of surface mesh
 	 */
 	void setupTriangleDataStructure(void);
+
+	Vector calculateNormalFor4Neighbours(int,int);
+
+	Vector calculateNormalFor8Neighbours(int,int);
+
+	float3 *cpu_vertices;
+	float3 *gpu_vertices;
+	float3 *cpu_normals;
+	float3 *gpu_normals;
+	unsigned int *DIM;
 
 };
 

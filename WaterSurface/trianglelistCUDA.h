@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+#include <cutil_math.h>
 
 class Triangle;
 class Vector;
@@ -11,7 +12,8 @@ class Vector;
 class TriangleListCUDA : public TriangleList
 {
 public:
-	void AddTriangle(Triangle *tr, int compareTriangles);
+	void AddTriangle(Triangle *tr, unsigned int compareTriangles);
+	void ToCUDADataStructure(int *triangles,int *neighbours,float3 *v1,float3 *v2,float3 *v3);
 
 };
 #endif

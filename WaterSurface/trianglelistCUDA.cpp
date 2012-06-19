@@ -4,10 +4,10 @@
 #include <algorithm>
 
 
-void TriangleListCUDA::AddTriangle(Triangle *triangle, int compareTriangles)
+void TriangleListCUDA::AddTriangle(Triangle *triangle, unsigned int compareTriangles)
 {
 	if (triangles.size() < compareTriangles) compareTriangles=triangles.size();
-	for (int index=triangles.size()-compareTriangles; index<triangles.size();index++)
+	for (unsigned int index=triangles.size()-compareTriangles; index<triangles.size();index++)
 	{
 		Triangle *tr = triangles.at(index);
 		if (tr->IsAdjacentVector(triangle->Point1))
@@ -28,4 +28,11 @@ void TriangleListCUDA::AddTriangle(Triangle *triangle, int compareTriangles)
 
 	}
 	triangles.push_back(triangle);
+}
+
+
+void TriangleListCUDA::ToCUDADataStructure(int *trianglesCUDA,int *neighboursCUDA,float3 *v1CUDA,float3 *v2CUDA,float3 *v3CUDA)
+{
+	trianglesCUDA = new int[triangles.size()]();
+	neighboursCUDA = new int[neighbourTriangles.size()]();
 }

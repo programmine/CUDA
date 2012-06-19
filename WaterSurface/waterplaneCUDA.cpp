@@ -18,6 +18,9 @@ WaterPlane* WaterPlaneCUDA::getWaterPlane(){
 	return WaterPlaneExemplar;
 }
 
+WaterPlaneCUDA::WaterPlaneCUDA():WaterPlane(){
+
+}
 
 void WaterPlaneCUDA::configure(Vector upperLeft, Vector lowerRight, float dampFactor, float resolution)
 {
@@ -53,6 +56,17 @@ void WaterPlaneCUDA::configure(Vector upperLeft, Vector lowerRight, float dampFa
 	initBuffer();
 
 	setupTriangleDataStructure();
+
+	gpu_vertices = new float3[vertices.size()];
+	gpu_normals = new float3[vertices.size()];
+
+	for (unsigned int i=0;i<vertices.size();i++) {
+		gpu_vertices[i]=make_float3(0,0,0);
+		gpu_normals[i]=make_float3(0,1.0,0);
+	}
+	cutilSafeCall(cudaMalloc((void**)&gpu_vertices,vertices.size()*sizeof(float3)));
+	cutilSafeCall(cudaMalloc((void**)&gpu_normals,vertices.size()*sizeof(float3)));
+	cutilSafeCall(cudaMalloc((void**)&DIM,sizeof(unsigned int)));
 
 	drawMesh();
 }
@@ -127,6 +141,8 @@ void WaterPlaneCUDA::update()
 		}
 	}
 
+	bool dimensionUneven = (pointsX % 2 == 1);
+
 	for (unsigned int x = 0; x< pointsX ; x++){
 
 		for (unsigned int y = 0; y < pointsY; y++){
@@ -134,20 +150,213 @@ void WaterPlaneCUDA::update()
 			vIndex = (y * pointsX) + x;
 			Vector *v = vertices.at(vIndex);
 
-			std::vector<Triangle*> neighbourTr = triangles->GetNeighbourTriangles(v);
-
-			Vector *normal = new Vector(0,0,0);
-			for (int triangleIndex = 0; triangleIndex < neighbourTr.size(); triangleIndex++)
+			int noOfNeighbourVertices = 0;
+			
+			if ((dimensionUneven)||((int)(vIndex/pointsX))%2 == 0)
 			{
-				Triangle *tr = neighbourTr.at(triangleIndex);
-				*normal = *normal + *(tr->UpdateNormal());
+				if (vIndex % 2 == 1)  noOfNeighbourVertices = 8;
+				else noOfNeighbourVertices = 4;
 			}
-			Vector normalizedNormal = Vector::Normalize(*normal);
+			else
+			{
+				if (vIndex % 2 == 1)  noOfNeighbourVertices = 4;
+				else noOfNeighbourVertices = 8;
+			}
+
+			Vector normal = Vector(0,0,0);
+			
+			if (noOfNeighbourVertices == 4) normal = calculateNormalFor4Neighbours(vIndex,pointsX);
+			else  normal = calculateNormalFor8Neighbours(vIndex,pointsX);
+
+			Vector normalizedNormal = Vector::Normalize(normal);
 			v->setNormal(normalizedNormal.get(0),normalizedNormal.get(1),normalizedNormal.get(2));
 		}
 	}
 }
 
+
+
+Vector WaterPlaneCUDA::calculateNormalFor8Neighbours(int vIndex, int Dimension)
+{
+	int d = (int)(vIndex/Dimension);
+
+	/*     v5
+	v6	*--*--* v4
+		|\ | /|
+	v7  *--*--* v3
+		|/ | \|
+	v8	*--*--* v2
+		   v1  
+	*/
+
+	Vector *v = vertices.at(vIndex);
+	Vector *normal = new Vector(0,0,0);
+	int v1Index = (vIndex - 1);
+	int v2Index = (vIndex - Dimension - 1);
+	int v3Index = (vIndex - Dimension);
+	int v4Index = (vIndex - Dimension + 1);
+	int v5Index = (vIndex + 1);
+	int v6Index = (vIndex + Dimension + 1);
+	int v7Index = (vIndex + Dimension);
+	int v8Index = (vIndex + Dimension - 1);
+
+	Vector *v2,*v1; 
+	Vector s1,s2;
+	if ((v1Index >= 0)&&((v1Index/Dimension) == d)){
+
+		//triangle - bottom and right
+		if (v2Index >= 0){
+			v2 = vertices.at(v1Index);
+			v1 = vertices.at(v2Index);
+			s1 = *v1 - *v;
+			s2 = *v2 - *v;
+			*normal = *normal + (s2.crossProduct(s1)); 
+		}
+
+		//triangle - bottom and left
+		if ((v8Index/Dimension) < Dimension){
+			v2 = vertices.at(v1Index);
+			v1 = vertices.at(v8Index);
+			s1 = *v1 - *v;
+			s2 = *v2 - *v;
+			*normal = *normal + (s1.crossProduct(s2)); 
+		}
+	}
+
+	
+	if ((v3Index >= 0)&&(d > 0)){
+
+		//triangle - middle right and bottom
+		if ((v2Index >= 0)&&((v2Index/Dimension) == d - 1)){
+			v2 = vertices.at(v2Index);
+			v1 = vertices.at(v3Index);
+			s1 = *v1 - *v;
+			s2 = *v2 - *v;
+			*normal = *normal + (s2.crossProduct(s1)); 
+		}
+
+		//triangle - middle right and top
+		if ((v4Index >= 0)&&((v4Index/Dimension) == d - 1)){
+			v2 = vertices.at(v3Index);
+			v1 = vertices.at(v4Index);
+			s1 = *v1 - *v;
+			s2 = *v2 - *v;
+			*normal = *normal + (s1.crossProduct(s2)); 
+		}
+	}
+
+	if ((v5Index/Dimension) == d){
+
+		//triangle - top and right
+		if ((v4Index >= 0)&&(d > 0)&&((v4Index/Dimension) == d - 1)){
+			v2 = vertices.at(v4Index);
+			v1 = vertices.at(v5Index);
+			s1 = *v1 - *v;
+			s2 = *v2 - *v;
+			*normal = *normal + (s2.crossProduct(s1)); 
+		}
+
+		//triangle - top and left
+		if ((d+1 < Dimension)&&((v6Index/Dimension) == d + 1)){
+			v2 = vertices.at(v5Index);
+			v1 = vertices.at(v6Index);
+			s1 = *v1 - *v;
+			s2 = *v2 - *v;
+			*normal = *normal + (s2.crossProduct(s1)); 
+		}
+	}
+
+	if (v7Index < Dimension){
+
+		//triangle - left middle and top
+		if ((d+1 < Dimension)&&((v6Index/Dimension) == d + 1)){
+			v2 = vertices.at(v6Index);
+			v1 = vertices.at(v7Index);
+			s1 = *v1 - *v;
+			s2 = *v2 - *v;
+			*normal = *normal + (s2.crossProduct(s1)); 
+		}
+
+		//triangle - left middle and bottom
+		if ((d+1 < Dimension)&&((v8Index/Dimension) == d + 1)){
+			v2 = vertices.at(v7Index);
+			v1 = vertices.at(v8Index);
+			s1 = *v1 - *v;
+			s2 = *v2 - *v;
+			*normal = *normal + (s1.crossProduct(s2)); 
+		}
+	}
+
+	return *normal;
+}
+
+
+Vector WaterPlaneCUDA::calculateNormalFor4Neighbours(int vIndex, int Dimension)
+{
+	int d = (int)(vIndex/Dimension);
+
+	/*     v4
+		*--*--*
+		| /|\ |
+	v3  *--*--* v2
+		| \|/ |
+		*--*--*
+		   v1
+	*/
+	Vector *v = vertices.at(vIndex);
+	Vector *normal = new Vector(0,0,0);
+	int v1Index = (vIndex - 1);
+	int v2Index = (vIndex - Dimension);
+	int v3Index = (vIndex + Dimension);
+	int v4Index = (vIndex + 1);
+
+	Vector *v2,*v1; 
+	Vector s1,s2;
+
+	if ((v1Index >= 0)&&((v1Index/Dimension) == d)){
+
+		//triangle - bottom and right
+		if (v2Index >= 0){
+			v2 = vertices.at(v1Index);
+			v1 = vertices.at(v2Index);
+			s1 = *v1 - *v;
+			s2 = *v2 - *v;
+			*normal = *normal + (s2.crossProduct(s1)); 
+		}
+
+		//triangle - bottom and left
+		if ((v3Index/Dimension) < Dimension){
+			v2 = vertices.at(v1Index);
+			v1 = vertices.at(v3Index);
+			s1 = *v1 - *v;
+			s2 = *v2 - *v;
+			*normal = *normal + (s1.crossProduct(s2)); 
+		}
+	}
+
+	
+	if ((v4Index/Dimension) == d){
+
+		//triangle - top and right
+		if (v2Index >= 0){
+			v2 = vertices.at(v2Index);
+			v1 = vertices.at(v4Index);
+			s1 = *v1 - *v;
+			s2 = *v2 - *v;
+			*normal = *normal + (s2.crossProduct(s1)); 
+		}
+
+		//triangle - top and left
+		if ((v3Index/Dimension) < Dimension){
+			v2 = vertices.at(v3Index);
+			v1 = vertices.at(v4Index);
+			s1 = *v1 - *v;
+			s2 = *v2 - *v;
+			*normal = *normal + (s1.crossProduct(s2)); 
+		}
+	}
+	return *normal;
+}
 
 void WaterPlaneCUDA::initBuffer()
 {
@@ -173,4 +382,11 @@ void WaterPlaneCUDA::initBuffer()
 			vertices.push_back(v);
 		}
 	}
+}
+
+
+WaterPlaneCUDA::~WaterPlaneCUDA(){
+	cudaFree(gpu_normals);
+	cudaFree(gpu_vertices);
+	cudaFree(DIM);
 }

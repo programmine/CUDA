@@ -20,15 +20,7 @@ template <class C> void FreeClear( C & cntr ) {
 
 TriangleList::~TriangleList(void)
 {
-	/* Fill vector here */
 	triangles.clear();
-
-	//for (int index=0;index<triangles.size();index++)
-	//{
-	//	delete triangles.at(index);
-	//}
-	//triangles.clear();
-	//FreeClear(triangles);
 }
 
 

@@ -33,7 +33,7 @@ void WaterPlane::toggleEdges(){
 void WaterPlane::configure(Vector upperLeft, Vector lowerRight, float dampFactor, float resolution)
 {
 
-	stepSize = 1.0/resolution;
+	stepSize = 1.0f/resolution;
 
 	resolutionFactor = resolution;
 
@@ -157,10 +157,10 @@ void WaterPlane::disturbArea(float xmin, float zmin, float xmax, float zmax, flo
 	float centerZ = getWaterPlaneY((zmax+zmin)/2.0f);
 	float r2 = radius * radius;
 
-	float xminW = getWaterPlaneX(xmin);
-	float zminW = getWaterPlaneY(zmin);
-	float xmaxW = getWaterPlaneX(xmax);
-	float zmaxW = getWaterPlaneY(zmax);
+	unsigned int xminW = getWaterPlaneX(xmin);
+	unsigned int zminW = getWaterPlaneY(zmin);
+	unsigned int xmaxW = getWaterPlaneX(xmax);
+	unsigned int zmaxW = getWaterPlaneY(zmax);
 
 	for(unsigned int x = xminW; x <= xmaxW; x++)
 	{
@@ -243,6 +243,7 @@ void WaterPlane::update()
 			v->set(1, n);
 		}
 	}
+
 
 	for (unsigned int x = 0; x< pointsX ; x++){
 
