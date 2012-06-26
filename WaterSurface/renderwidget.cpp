@@ -311,7 +311,7 @@ void RenderWidget::initializeGL()
 {
 	glEnable(GL_DEPTH_TEST);
 	initializeLights();
-	waterplane=WaterPlaneCUDA::getWaterPlane();
+	waterplane=WaterPlane::getWaterPlane();
 	waterplane->configure(Vector(0,0,0),Vector(surfaceSize,0,surfaceSize),damping,resolution);
 	waterplane->update();
 }

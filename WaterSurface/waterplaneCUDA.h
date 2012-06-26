@@ -50,6 +50,9 @@ protected:
 
 	Vector calculateNormalFor8Neighbours(int,int);
 
+	float3* convertFromCPUToGPUVertices();
+	void convertFromGPUToCPUVertices(float3*,float3*);
+
 	float3 *cpu_vertices;
 	float3 *gpu_vertices;
 	float3 *cpu_normals;

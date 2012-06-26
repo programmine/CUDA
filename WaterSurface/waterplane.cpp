@@ -259,6 +259,7 @@ void WaterPlane::update()
 			{
 				Triangle *tr = neighbourTr.at(triangleIndex);
 				*normal = *normal + *(tr->UpdateNormal());
+				//std::cout<<normal->get(0)<<","<<normal->get(1)<<","<<normal->get(2)<<std::endl;
 			}
 			Vector normalizedNormal = Vector::Normalize(*normal);
 			v->setNormal(normalizedNormal.get(0),normalizedNormal.get(1),normalizedNormal.get(2));

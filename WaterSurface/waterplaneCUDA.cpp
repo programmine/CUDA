@@ -9,6 +9,8 @@
 #include <iostream> 
 #include <math.h>
 
+#include "GPUFunctions.cuh"
+
 // Singleton
 WaterPlane* WaterPlaneCUDA::getWaterPlane(){
 
@@ -59,10 +61,12 @@ void WaterPlaneCUDA::configure(Vector upperLeft, Vector lowerRight, float dampFa
 
 	gpu_vertices = new float3[vertices.size()];
 	gpu_normals = new float3[vertices.size()];
+	cpu_normals = new float3[vertices.size()];
 
 	for (unsigned int i=0;i<vertices.size();i++) {
 		gpu_vertices[i]=make_float3(0,0,0);
 		gpu_normals[i]=make_float3(0,1.0,0);
+		cpu_normals[i]=make_float3(0,1.0,0);
 	}
 	cutilSafeCall(cudaMalloc((void**)&gpu_vertices,vertices.size()*sizeof(float3)));
 	cutilSafeCall(cudaMalloc((void**)&gpu_normals,vertices.size()*sizeof(float3)));
@@ -141,39 +145,33 @@ void WaterPlaneCUDA::update()
 		}
 	}
 
-	bool dimensionUneven = (pointsX % 2 == 1);
 
-	for (unsigned int x = 0; x< pointsX ; x++){
-
-		for (unsigned int y = 0; y < pointsY; y++){
-
-			vIndex = (y * pointsX) + x;
-			Vector *v = vertices.at(vIndex);
-
-			int noOfNeighbourVertices = 0;
-			
-			if ((dimensionUneven)||((int)(vIndex/pointsX))%2 == 0)
-			{
-				if (vIndex % 2 == 1)  noOfNeighbourVertices = 8;
-				else noOfNeighbourVertices = 4;
-			}
-			else
-			{
-				if (vIndex % 2 == 1)  noOfNeighbourVertices = 4;
-				else noOfNeighbourVertices = 8;
-			}
-
-			Vector normal = Vector(0,0,0);
-			
-			if (noOfNeighbourVertices == 4) normal = calculateNormalFor4Neighbours(vIndex,pointsX);
-			else  normal = calculateNormalFor8Neighbours(vIndex,pointsX);
-
-			Vector normalizedNormal = Vector::Normalize(normal);
-			v->setNormal(normalizedNormal.get(0),normalizedNormal.get(1),normalizedNormal.get(2));
-		}
-	}
+	cpu_vertices = convertFromCPUToGPUVertices();
+	cutilSafeCall(cudaMemcpy(gpu_vertices,cpu_vertices,(pointsX*pointsX)*sizeof(float3),cudaMemcpyHostToDevice));
+	cutilSafeCall(cudaMemcpy(gpu_normals,cpu_normals,(pointsX*pointsX)*sizeof(float3),cudaMemcpyHostToDevice));
+	cutilSafeCall(cudaMemcpy(DIM,&pointsX,sizeof(unsigned int),cudaMemcpyHostToDevice));
+	updateNormalsGPU1(gpu_vertices,gpu_normals,DIM);
+	cutilSafeCall(cudaMemcpy(cpu_vertices,gpu_vertices,(pointsX*pointsX)*sizeof(float3),cudaMemcpyDeviceToHost));
+	cutilSafeCall(cudaMemcpy(cpu_normals,gpu_normals,(pointsX*pointsX)*sizeof(float3),cudaMemcpyDeviceToHost));
+	convertFromGPUToCPUVertices(cpu_vertices,cpu_normals);
 }
 
+
+float3* WaterPlaneCUDA::convertFromCPUToGPUVertices(){
+	float3 *cvertices = new float3[vertices.size()];
+	for (unsigned int i=0;i<vertices.size();i++) {
+		cvertices[i]=make_float3(vertices.at(i)->get(0),vertices.at(i)->get(1),vertices.at(i)->get(2));
+	}
+	return cvertices;
+}
+
+
+void WaterPlaneCUDA::convertFromGPUToCPUVertices(float3* cvertices, float3* cnormals){
+	for (unsigned int i=0;i<vertices.size();i++) {
+		vertices.at(i)->setVector(cvertices[i].x,cvertices[i].y,cvertices[i].z);
+		vertices.at(i)->setNormal(cnormals[i].x,cnormals[i].y,cnormals[i].z);
+	}
+}
 
 
 Vector WaterPlaneCUDA::calculateNormalFor8Neighbours(int vIndex, int Dimension)
