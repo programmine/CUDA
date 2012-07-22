@@ -1,5 +1,7 @@
-#include <cutil_inline.h>
+
 #include <cuda.h>
+
+#include <cutil_inline.h>
 #include <cutil_math.h>
 
 __global__ void updateWaveMapGPU2( float* dev_newWave, float* dev_oldWave,unsigned int *dev_arraySize, unsigned int *dev_arrayDIM){

@@ -7,7 +7,8 @@ class WMatrix;
 class TriangleList;
 #include "vector.h"
 #include <vector>
-
+#include <windows.h>
+#include <GL/glew.h>
 /**
  * Water surface
  *
@@ -107,23 +108,32 @@ protected:
 	/**
 	 * calculates the water surface x point from the world coordinates of realX
 	 */
-	unsigned int getWaterPlaneX(float realX);
+	int getWaterPlaneX(float realX);
 
 	/**
 	 * calculates the water surface point y from the world coordinates of realY
 	 */
-	unsigned int getWaterPlaneY(float realY);
+	int getWaterPlaneY(float realY);
 
 	/**
 	 * creates triangle data structure of surface mesh
 	 */
 	void setupTriangleDataStructure(void);
 
+	void createVBO(GLuint* vbo, int size);
+
+	void deleteVBO(GLuint* vbo);
+
+	void createMeshPositionVBO(GLuint *id, int w, int h);
+
+	void createMeshIndexBuffer(GLuint *id, int w, int h);
+
 	//resolution factor
 	float resolutionFactor;
 
 	//Vertices of the surface mesh
-	std::vector<Vector*> vertices;
+	Vector* vertices;
+	Vector* normals;
 
 	/** 
 	 * data structure (buffers) for wave creation
@@ -134,19 +144,24 @@ protected:
 
 	Vector lRight;
 
-	unsigned int pointsX;
+	int pointsX;
 
-	unsigned int pointsY;
+	int pointsY;
 
-	unsigned int sizeX;
+	int sizeX;
 
-	unsigned int sizeY;
+	int sizeY;
 
 	float stepSize;
 
 	float baseHeight;
 
-	TriangleList *triangles;
+	GLuint indexVertexBuffer;
+	GLuint vertexBuffer;
+
+	GLuint indexNormalBuffer;
+	GLuint normalBuffer;
+
 
 	bool showEdges;
 };

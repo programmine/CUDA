@@ -2,90 +2,60 @@
 #include <iostream> 
 #include <math.h>
 
-Vector::Vector(float x, float y, float z)
-{
-	vector[0]=x;
-	vector[1]=y;
-	vector[2]=z;
-}
 
 Vector::Vector()
 {
-	vector[0]=0;
-	vector[1]=0;
-	vector[2]=0;
+	x = 0;
+	y = 0;
+	z = 0;
+}
+
+Vector::Vector(float _x,float _y,float _z)
+{
+	x = _x;
+	y = _y;
+	z = _z;
 }
 
 Vector::~Vector(void)
 {
 }
 
-float Vector::get(int pos){
-	return vector[pos];
-}
 
-void Vector::setVector(float x, float y, float z){
-	vector[0]=x;
-	vector[1]=y;
-	vector[2]=z;
-}
-
-void Vector::set(int pos, float val){
-	vector[pos]=val;
-}
 
 Vector Vector::crossProduct(Vector other)
 {
 	Vector cross(0.0f,0.0f,0.0f);
-	cross.set(0, this->get(1) * other.get(2) - other.get(1) * this->get(2));
-	cross.set(1, this->get(2) * other.get(0) - other.get(2) * this->get(0));
-	cross.set(2, this->get(0) * other.get(1) - other.get(0) * this->get(1));
+	cross.x = y * other.z - other.y * z;
+	cross.y = z * other.x - other.z * x;
+	cross.z = x * other.y - other.x * y;
 	return cross;
 }
 
-void Vector::setNormal(float x, float y, float z){
-	normal[0]=x;
-	normal[1]=y;
-	normal[2]=z;
-}
 
-float Vector::getNormal(int pos){
-	return normal[pos];
-}
-
-void Vector::setTexture(float x, float y, float z){
-	texture[0]=x;
-	texture[1]=y;
-	texture[2]=z;
-}
-
-float Vector::getTexture(int pos){
-	return texture[pos];
-}
-
-Vector& Vector::operator+(Vector& other){
-	Vector v(other.get(0)+vector[0],other.get(1)+vector[1],other.get(2)+vector[2]);
+Vector Vector::operator+(Vector other){
+	Vector v(other.x + x,other.y+y,other.z+z);
 	return v;
 }
 
 
-Vector& Vector::operator-(Vector& other){
-	Vector v(-other.get(0)+vector[0],-other.get(1)+vector[1],-other.get(2)+vector[2]);
+Vector Vector::operator-(Vector other){
+	Vector v(-other.x+x,-other.y+y,-other.z+z);
 	return v;
 }
 
-Vector& Vector::operator/(int d){
-	Vector v(vector[0]/d,-vector[1]/d,vector[2]/d);
+Vector Vector::operator/(int d){
+	Vector v(x/d,-y/d,z/d);
 	return v;
 }
 
-bool Vector::operator==(Vector& other){
-	return ((other.get(0)==vector[0]) && (other.get(1)==vector[1]) && (other.get(2)==vector[2]));
+bool Vector::operator==(Vector other){
+	return ((other.x==x) && (other.y==y) && (other.z==z));
 }
 
 
 Vector Vector::Normalize(Vector v)
 {
-	float length=sqrt((v.get(0)*v.get(0))+(v.get(1)*v.get(1))+(v.get(2)*v.get(2)));
-	return Vector(v.get(0)/length,v.get(1)/length,v.get(2)/length);
+	float length=sqrt((v.x*v.x)+(v.y*v.y)+(v.z*v.z));
+	return Vector(v.x/length,v.y/length,v.z/length);
 }

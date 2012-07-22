@@ -31,14 +31,14 @@ WMatrix::~WMatrix(void)
 	delete Values;
 }
 
-void WMatrix::setElement(unsigned int column, unsigned int row, float value)
+void WMatrix::setElement(int column, int row, float value)
 {
 	if ((row >= rowCount)||(row < 0)) return;
 	if ((column >= columnCount)||(column < 0)) return;
 	Values[column][row] = value;
 }
 
-float WMatrix::getElement(unsigned int column, unsigned int row)
+float WMatrix::getElement(int column, int row)
 {
 	return Values[column][row];
 }

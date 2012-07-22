@@ -1,9 +1,10 @@
 #pragma once
+#include "waterplane.h"
 #include <QtOpenGL/QGLWidget>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QKeyEvent>
 #include <QtCore/QTimer>
-#include "waterplane.h"
+
 
 class QPoint;
 

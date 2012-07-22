@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-WaveMap::WaveMap(unsigned int pX, unsigned int pY, float damp)
+WaveMap::WaveMap(int pX, int pY, float damp)
 {
 	this->oldWave = new WMatrix(pX, pY);
 
@@ -16,12 +16,12 @@ WaveMap::WaveMap(unsigned int pX, unsigned int pY, float damp)
 	this->pointsY = pY;
 }
 
-float WaveMap::getHeight(unsigned int x, unsigned int y)
+float WaveMap::getHeight(int x, int y)
 {
 	return newWave->getElement(x, y);
 }
 
-void WaveMap::push(unsigned int x, unsigned int y, float value)
+void WaveMap::push(int x, int y, float value)
 {
 	oldWave->setElement(x, y, value);
 }

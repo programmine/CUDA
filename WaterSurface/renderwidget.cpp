@@ -2,7 +2,7 @@
 
 #include "renderwidget.h"
 #include "waterplaneCUDA.h"
-#include <GL/gl.h>
+#include <GL/glew.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
 #include <QtCore/QTime>
@@ -81,11 +81,11 @@ void RenderWidget::drawFPS(void)
 	QString text = QString("FPS %1").arg(fps);
 	QFontMetrics metrics = QFontMetrics(font());
 	int border = qMax(4, metrics.leading());
-	QRect rect = metrics.boundingRect(0, 0, width - 2*border, int(height),Qt::AlignCenter | Qt::TextWordWrap, text);
+	QRect rect = metrics.boundingRect(0, 0, width - 2*border, (int)height,Qt::AlignCenter | Qt::TextWordWrap, text);
 
 	QPainter painter(this);
 	painter.setPen(Qt::white);
-	painter.drawText((width - rect.width())/2, border,rect.width(), rect.height(),Qt::AlignCenter | Qt::TextWordWrap, text);
+	painter.drawText((width - rect.width())/2.0f, border,rect.width(), rect.height(),Qt::AlignCenter | Qt::TextWordWrap, text);
 	painter.end();
 }
 
@@ -301,7 +301,6 @@ void RenderWidget::paintGL()
 	waterplane->drawMesh();
 	glTranslatef(surfaceSize/2.0,0,surfaceSize/2.0);
 
-	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	drawFPS();
 	update();
 }
@@ -309,8 +308,10 @@ void RenderWidget::paintGL()
 
 void RenderWidget::initializeGL()
 {
+	
 	glEnable(GL_DEPTH_TEST);
 	initializeLights();
+	glewInit();
 	waterplane=WaterPlane::getWaterPlane();
 	waterplane->configure(Vector(0,0,0),Vector(surfaceSize,0,surfaceSize),damping,resolution);
 	waterplane->update();

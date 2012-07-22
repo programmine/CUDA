@@ -16,12 +16,12 @@ public:
 	/**
 	 * Gibt den Wert des jeweiligen Elements zurück.
 	 */
-	float getElement(unsigned int column, unsigned int row);
+	float getElement(int column, int row);
 
 	/**
 	 * Setzt den Wert des jeweiligen Elements zurück.
 	 */
-	void setElement(unsigned int column, unsigned int row, float value);
+	void setElement(int column, int row, float value);
 
 	/**
 	 * Die Größe der Matrix.

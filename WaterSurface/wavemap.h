@@ -20,7 +20,7 @@ public:
 	 * Erzeugt eine neue WaveMap mit der Ausdehnung pX * pY und einem damp - Factor.
 	 * Dieser wird für die Berechnung der Welle bzw. deren Ausdehnung herangezogen.
 	 */
-	WaveMap(unsigned int pX, unsigned int pY, float damp);
+	WaveMap(int pX, int pY, float damp);
 
 	/**
 	 * Vertauscht die beiden Buffer in ihrer Rolle.
@@ -30,7 +30,7 @@ public:
 	/**
 	 * Verhändert den Höhenwert um an der Stelle (x,y).
 	 */
-	void push(unsigned int x, unsigned int y, float value);
+	void push(int x, int y, float value);
 
 	/**
 	 * Berechnet die aktuelle Höhenfledbelegung
@@ -50,7 +50,7 @@ public:
 	/** 
 	 * Höhenwert an Stelle (x,y)
 	 */
-	float getHeight(unsigned int x, unsigned int y);
+	float getHeight(int x, int y);
 
 	virtual ~WaveMap(void);
 
@@ -60,8 +60,8 @@ protected:
 	WMatrix* oldWave;
 	WMatrix* newWave;
 
-	unsigned int pointsX;
-	unsigned int pointsY;
+	int pointsX;
+	int pointsY;
 	
 	float sizeX;
 	float sizeY;

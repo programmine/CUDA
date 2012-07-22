@@ -25,6 +25,10 @@ public:
 	 */
 	virtual void update(void);
 
+	virtual void drawMesh(void);
+
+	void drawTriangle(float3,float3,float3,float3,float3,float3);
+
 	/**
 	 * returns instance of WaterPlaneCUDA
 	 */
@@ -50,9 +54,8 @@ protected:
 
 	Vector calculateNormalFor8Neighbours(int,int);
 
-	float3* convertFromCPUToGPUVertices();
-	void convertFromGPUToCPUVertices(float3*,float3*);
-
+	float3 *CUDAvertices;
+	float3 *CUDAnormals;
 	float3 *cpu_vertices;
 	float3 *gpu_vertices;
 	float3 *cpu_normals;
