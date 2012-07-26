@@ -4,7 +4,6 @@
 
 class WaveMap;
 class WMatrix;
-class TriangleList;
 #include "vector.h"
 #include "waterplane.h"
 #include <vector>
@@ -45,17 +44,10 @@ protected:
 	 */
 	void initBuffer(void);
 
-	/**
-	 * creates triangle data structure of surface mesh
-	 */
-	void setupTriangleDataStructure(void);
-
 	Vector calculateNormalFor4Neighbours(int,int);
 
 	Vector calculateNormalFor8Neighbours(int,int);
 
-	float3 *CUDAvertices;
-	float3 *CUDAnormals;
 	float3 *cpu_vertices;
 	float3 *gpu_vertices;
 	float3 *cpu_normals;

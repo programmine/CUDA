@@ -1,10 +1,8 @@
 #ifndef WATERPLANE_H
 #define WATERPLANE_H
 
-
 class WaveMap;
 class WMatrix;
-class TriangleList;
 #include "vector.h"
 #include <vector>
 #include <windows.h>
@@ -114,11 +112,6 @@ protected:
 	 * calculates the water surface point y from the world coordinates of realY
 	 */
 	int getWaterPlaneY(float realY);
-
-	/**
-	 * creates triangle data structure of surface mesh
-	 */
-	void setupTriangleDataStructure(void);
 
 	void createVBO(GLuint* vbo, int size);
 

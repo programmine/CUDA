@@ -47,219 +47,80 @@ void updateWaveMapGPU1(float* dev_newWave, float* dev_oldWave,unsigned int *dev_
 }
 
 
-__device__ float3 calculateNormalFor4Neighbours(float3* vertices, unsigned int *DIM, int vIndex){
-	int d = (int)(vIndex/ *DIM);
-
-	/*     v4
-		*--*--*
-		| /|\ |
-	v3  *--*--* v2
-		| \|/ |
-		*--*--*
-		   v1
-	*/
-	float3 v = vertices[vIndex];
-	float3 normal = make_float3(0,0,0);
-	int v1Index = (vIndex - 1);
-	int v2Index = (vIndex -  *DIM);
-	int v3Index = (vIndex +  *DIM);
-	int v4Index = (vIndex + 1);
-
-	float3 v2,v1; 
-	float3 s1,s2;
-
-	if ((v1Index >= 0)&&((v1Index/ *DIM) == d)){
-
-		//triangle - bottom and right
-		if (v2Index >= 0){
-			v2 = vertices[v1Index];
-			v1 = vertices[v2Index];
-			s1 = v1 - v;
-			s2 = v2 - v;
-			normal = normal + cross(s2,s1); 
-		}
-
-		//triangle - bottom and left
-		if ((v3Index/ *DIM) <  *DIM){
-			v2 = vertices[v1Index];
-			v1 = vertices[v3Index];
-			s1 = v1 - v;
-			s2 = v2 - v;
-			normal = normal + cross(s1,s2); 
-		}
-	}
-
-	
-	if ((v4Index/ *DIM) == d){
-
-		//triangle - top and right
-		if (v2Index >= 0){
-			v2 = vertices[v2Index];
-			v1 = vertices[v4Index];
-			s1 = v1 - v;
-			s2 = v2 - v;
-			normal = normal + cross(s2,s1); 
-		}
-
-		//triangle - top and left
-		if ((v3Index/ *DIM) <  *DIM){
-			v2 = vertices[v3Index];
-			v1 = vertices[v4Index];
-			s1 = v1 - v;
-			s2 = v2 - v;
-			normal = normal + cross(s1,s2); 
-		}
-	}
-	return normal;
-}
-
-__device__ float3 calculateNormalFor8Neighbours(float3* vertices, unsigned int *DIM, int vIndex){
-	int d = (int)(vIndex/ *DIM);
-
-	/*     v5
-	v6	*--*--* v4
-		|\ | /|
-	v7  *--*--* v3
-		|/ | \|
-	v8	*--*--* v2
-		   v1  
-	*/
-
-	float3 v = vertices[vIndex];
-	float3 normal = make_float3(0,0,0);
-	int v1Index = (vIndex - 1);
-	int v2Index = (vIndex - *DIM - 1);
-	int v3Index = (vIndex - *DIM);
-	int v4Index = (vIndex - *DIM + 1);
-	int v5Index = (vIndex + 1);
-	int v6Index = (vIndex + *DIM + 1);
-	int v7Index = (vIndex + *DIM);
-	int v8Index = (vIndex + *DIM - 1);
-
-	float3 v2,v1; 
-	float3 s1,s2;
-	if ((v1Index >= 0)&&((v1Index/ *DIM) == d)){
-
-		//triangle - bottom and right
-		if (v2Index >= 0){
-			v2 = vertices[v1Index];
-			v1 = vertices[v2Index];
-			s1 = v1 - v;
-			s2 = v2 - v;
-			normal = normal + cross(s2,s1); 
-		}
-
-		//triangle - bottom and left
-		if ((v8Index/ *DIM) < *DIM){
-			v2 = vertices[v1Index];
-			v1 = vertices[v8Index];
-			s1 = v1 - v;
-			s2 = v2 - v;
-			normal = normal + cross(s1,s2); 
-		}
-	}
-
-	
-	if ((v3Index >= 0)&&(d > 0)){
-
-		//triangle - middle right and bottom
-		if ((v2Index >= 0)&&((v2Index/ *DIM) == d - 1)){
-			v2 = vertices[v2Index];
-			v1 = vertices[v3Index];
-			s1 = v1 - v;
-			s2 = v2 - v;
-			normal = normal + cross(s2,s1); 
-		}
-
-		//triangle - middle right and top
-		if ((v4Index >= 0)&&((v4Index/ *DIM) == d - 1)){
-			v2 = vertices[v3Index];
-			v1 = vertices[v4Index];
-			s1 = v1 - v;
-			s2 = v2 - v;
-			normal = normal + cross(s1,s2); 
-		}
-	}
-
-	if ((v5Index/ *DIM) == d){
-
-		//triangle - top and right
-		if ((v4Index >= 0)&&(d > 0)&&((v4Index/ *DIM) == d - 1)){
-			v2 = vertices[v4Index];
-			v1 = vertices[v5Index];
-			s1 = v1 - v;
-			s2 = v2 - v;
-			normal = normal + cross(s2,s1); 
-		}
-
-		//triangle - top and left
-		if ((d+1 <  *DIM)&&((v6Index/ *DIM) == d + 1)){
-			v2 = vertices[v5Index];
-			v1 = vertices[v6Index];
-			s1 = v1 - v;
-			s2 = v2 - v;
-			normal = normal + cross(s2,s1); 
-		}
-	}
-
-	if (v7Index <  *DIM){
-
-		//triangle - left middle and top
-		if ((d+1 <  *DIM)&&((v6Index/ *DIM) == d + 1)){
-			v2 = vertices[v6Index];
-			v1 = vertices[v7Index];
-			s1 = v1 - v;
-			s2 = v2 - v;
-			normal = normal + cross(s2,s1); 
-		}
-
-		//triangle - left middle and bottom
-		if ((d+1 <  *DIM)&&((v8Index/ *DIM) == d + 1)){
-			v2 = vertices[v7Index];
-			v1 = vertices[v8Index];
-			s1 = v1 - v;
-			s2 = v2 - v;
-			normal = normal + cross(s1,s2); 
-		}
-	}
-
-	return normal;
-}
-
-
 __global__ void updateNormalsGPU2( float3* dev_vertices, float3* dev_normals,unsigned int *dev_DIM){
-	bool dimensionUneven = (*dev_DIM % 2 == 1);
-	int vIndex;
 
+	int nIndex;
 	int tid= blockIdx.x;
+	
+	
 	while (tid < (*dev_DIM* *dev_DIM)){
 
-		vIndex = tid;
+	/*
+			   1  2
+			*--*--*
+			| /| /|
+		  6 *--*--* 3
+			| /| /|
+			*--*--*
+			5  4
+*/
 
-		int noOfNeighbourVertices = 0;
+		nIndex = tid;
+		int d = (int)(nIndex/ *dev_DIM);
 		
-		if ((dimensionUneven)||((int)(vIndex / *dev_DIM))%2 == 0)
-		{
-			if (vIndex % 2 == 1)  noOfNeighbourVertices = 8;
-			else noOfNeighbourVertices = 4;
+		int v4Index = (nIndex - 1);
+		int v3Index = (nIndex - *dev_DIM);
+		int v2Index = (nIndex - *dev_DIM + 1);
+		int v1Index = (nIndex + 1);
+		int v6Index = (nIndex + *dev_DIM);
+		int v5Index = (nIndex + *dev_DIM - 1);
+		
+		float3 vertex = dev_vertices[nIndex];
+		float3 newNormal = make_float3(0,0,0);
+		
+		
+		
+		if ((v1Index/ *dev_DIM) == d){
+			float3 v1 = dev_vertices[v1Index];
+			float3 s1 = v1 - vertex;
+			if ((v2Index >= 0)&&(d > 0)&&((v2Index/ *dev_DIM) == d - 1)){
+				float3 v2 = dev_vertices[v2Index];
+				float3 s2 = v2 - vertex;
+				newNormal = newNormal + cross(s2,s1);
+			}
+			
+			if (v6Index <  *dev_DIM){
+				float3 v6 = dev_vertices[v6Index];
+				float3 s6 = v6 - vertex;
+				newNormal = newNormal + cross(s1,s6);
+			}
 		}
-		else
-		{
-			if (vIndex % 2 == 1)  noOfNeighbourVertices = 4;
-			else noOfNeighbourVertices = 8;
-		}
+		if ((v4Index >= 0)&&((v4Index/ *dev_DIM) == d)){
+			float3 v4 = dev_vertices[v4Index];
+			float3 s4 = v4 - vertex;
+			if ((v5Index/ *dev_DIM) < *dev_DIM){
+				float3 v5 = dev_vertices[v5Index];
+				float3 s5 = v5 - vertex;
+				newNormal = newNormal + cross(s5,s4);
+			}
 
-		float3 normal = make_float3(0,1,0);
-		
-		if (noOfNeighbourVertices == 4) normal = calculateNormalFor4Neighbours(dev_vertices,dev_DIM,vIndex);
-		else  normal = calculateNormalFor8Neighbours(dev_vertices,dev_DIM,vIndex);
-		dev_normals[vIndex] = normalize(normal);
+			if ((v3Index >= 0)&&(d > 0)){
+				float3 v3 = dev_vertices[v3Index];
+				float3 s3 = v3 - vertex;
+				newNormal = newNormal + cross(s4,s3);
+			}
+		}
+		dev_normals[nIndex] = normalize(newNormal);
 		tid += gridDim.x;
 	}
+	
+	
+	
+	
+	
 }
 
 void updateNormalsGPU1(float3* dev_vertices, float3* dev_normals,unsigned int *dev_DIM){
 	updateNormalsGPU2<<<15000,1>>>(dev_vertices,dev_normals,dev_DIM);
 }
-
 

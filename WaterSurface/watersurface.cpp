@@ -41,9 +41,13 @@ WaterSurface::WaterSurface(QWidget *parent, Qt::WFlags flags)
 	QCheckBox *checkbox = new QCheckBox("Toggle Edges");
 	QObject::connect(checkbox, SIGNAL(stateChanged(int)),this, SLOT(toggleEdges(int)));
 
+	framecounter = new QLabel("FPS");
+	QObject::connect(renderWidget, SIGNAL(frameCounterChanged(float)),this, SLOT(setFrameCounter(float)));
+
 	controlLayout->addWidget(checkbox,1,3);
 	controlLayout->addWidget(new QLabel("To rotate the scene press CTRL+mouse movement"),2,3);
 	controlLayout->addWidget(reset,3,1);
+	controlLayout->addWidget(framecounter,3,2);
 	setCentralWidget(centralWidget);
 	mainLayout->addLayout(controlLayout);
 	mainLayout->addWidget(renderWidget);  
@@ -74,6 +78,11 @@ void WaterSurface::resetWaveSettings()
 void WaterSurface::toggleEdges(int state)
 {
 	renderWidget->toggleEdges();
+}
+
+void WaterSurface::setFrameCounter(float fps)
+{
+	framecounter->setText(QString("       <b><big>%1 FPS</big></b>").arg(fps));
 }
 
 WaterSurface::~WaterSurface()

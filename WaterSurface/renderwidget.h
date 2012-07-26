@@ -31,6 +31,10 @@ protected:
 protected slots:
 		void render();
 
+signals:
+		void frameCounterChanged(float fps);
+
+
 private:
 	int width;
 	int height;

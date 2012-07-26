@@ -35,7 +35,7 @@ RenderWidget::RenderWidget(QWidget * parent)
 	disturbAreaMin = 1.30f;
 	disturbAreaMax = 1.60f;
 	disturbHeight = 0.1f;
-	resolution = 16;
+	resolution = 40;
 	damping = 32;
 	surfaceSize = 5.0;
 	waveSize = 0.1;
@@ -76,17 +76,8 @@ void RenderWidget::drawFPS(void)
 		//  Reset frame count
 		frameCount = 0;
 	}
+	emit frameCounterChanged(fps);
 
-
-	QString text = QString("FPS %1").arg(fps);
-	QFontMetrics metrics = QFontMetrics(font());
-	int border = qMax(4, metrics.leading());
-	QRect rect = metrics.boundingRect(0, 0, width - 2*border, (int)height,Qt::AlignCenter | Qt::TextWordWrap, text);
-
-	QPainter painter(this);
-	painter.setPen(Qt::white);
-	painter.drawText((width - rect.width())/2.0f, border,rect.width(), rect.height(),Qt::AlignCenter | Qt::TextWordWrap, text);
-	painter.end();
 }
 
 
@@ -312,7 +303,7 @@ void RenderWidget::initializeGL()
 	glEnable(GL_DEPTH_TEST);
 	initializeLights();
 	glewInit();
-	waterplane=WaterPlane::getWaterPlane();
+	waterplane=WaterPlaneCUDA::getWaterPlane();
 	waterplane->configure(Vector(0,0,0),Vector(surfaceSize,0,surfaceSize),damping,resolution);
 	waterplane->update();
 }

@@ -1,8 +1,6 @@
 #include "waterplane.h"
 #include "wavemap.h"
 #include "vector.h"
-#include "trianglelist.h"
-#include "triangle.h"
 #include <cstdlib>
 #include <iostream> 
 #include <math.h>
@@ -11,6 +9,9 @@ WaterPlane* WaterPlane::WaterPlaneExemplar = 0;
 
 WaterPlane::WaterPlane(){
 	showEdges=false;
+	vertices = new Vector[1];
+	normals = new Vector[1];
+
 }
 
 // Singleton
@@ -54,57 +55,14 @@ void WaterPlane::configure(Vector upperLeft, Vector lowerRight, float dampFactor
 	//Der "Meeresspiegel"
 	baseHeight = lRight.y;
 
-	//triangles = new TriangleList();
-
 	//Das Höhenfeld der Waterplane
 	waveMap = new WaveMap(pointsX, pointsY, dampFactor);
 
 	initBuffer();
 
-	//setupTriangleDataStructure();
-
 	drawMesh();
 }
 
-void WaterPlane::setupTriangleDataStructure()
-{
-	//bool odd = false;
-	//if (pointsY % 2 ==1) odd=true;
-
-	//for (unsigned int i=0; i < (pointsY*(pointsX-1));i++)
-	//{
-	//	//every second column first row
-	//	if (((i+1) % pointsY)==0) continue;
-	//	if (((i / pointsY) % 2 == 0) || (odd))
-	//	{
-	//		if (i % 2 == 0)
-	//		{	
-	//			triangles->AddTriangle(new Triangle(vertices.at(i),vertices.at(i+1),vertices.at(i+pointsY)),(2*pointsX+1));
-	//			triangles->AddTriangle(new Triangle(vertices.at(i+1),vertices.at(i+pointsY+1),vertices.at(i+pointsY)),(2*pointsX+1));
-
-	//		}else
-	//		{
-	//			triangles->AddTriangle(new Triangle(vertices.at(i),vertices.at(i+1),vertices.at(i+pointsY+1)),(2*pointsX+1));
-	//			triangles->AddTriangle(new Triangle(vertices.at(i),vertices.at(i+pointsY+1),vertices.at(i+pointsY)),(2*pointsX+1));
-	//		}
-	//	}
-	//	else
-	//	{
-	//		if (i % 2 == 1)
-	//		{	
-	//			triangles->AddTriangle(new Triangle(vertices.at(i),vertices.at(i+1),vertices.at(i+pointsY)),(2*pointsX+1));
-	//			triangles->AddTriangle(new Triangle(vertices.at(i+1),vertices.at(i+pointsY+1),vertices.at(i+pointsY)),(2*pointsX+1));
-
-	//		}else
-	//		{
-
-	//			triangles->AddTriangle(new Triangle(vertices.at(i),vertices.at(i+1),vertices.at(i+pointsY+1)),(2*pointsX+1));
-	//			triangles->AddTriangle(new Triangle(vertices.at(i),vertices.at(i+pointsY+1),vertices.at(i+pointsY)),(2*pointsX+1));
-	//		}
-	//	}
-
-	//}
-}
 
 void WaterPlane::createVBO(GLuint* vbo, int size)
 {
@@ -113,8 +71,6 @@ void WaterPlane::createVBO(GLuint* vbo, int size)
 	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
 	glBufferData(GL_ARRAY_BUFFER, size, 0, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//CUT_CHECK_ERROR_GL();
 }
 
 
@@ -152,8 +108,6 @@ void WaterPlane::createMeshIndexBuffer(GLuint *id, int w, int h)
 
 void WaterPlane::initBuffer()
 {
-	//vertices.clear();
-
 	//Start und Endkoordinaten für x-Richtung
 	float startX = this->uLeft.x;
 	float endX = this->lRight.x;
@@ -162,8 +116,8 @@ void WaterPlane::initBuffer()
 	float startY = this->uLeft.z;
 	float endY = this->lRight.z;
 
-	vertices = new Vector[pointsX*pointsY];
-	normals = new Vector[pointsX*pointsY];
+	vertices = new Vector[pointsY*pointsX];
+	normals = new Vector[pointsY*pointsX];
 	unsigned int count = 0;
 	for (float px = startX ; px< endX ; px+=stepSize){
 		for (float py = startY; py < endY; py+=stepSize){
@@ -189,20 +143,6 @@ void WaterPlane::initBuffer()
 	glBufferData( GL_ARRAY_BUFFER, pointsY*pointsX*3*sizeof(float), normals, GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-	//erzeuge entsprechend der Auflösung die benötigten Anzahl an Vertices und
-	// die dazugehörigen Normalen
-	//for (float px = startX ; px< endX ; px+=stepSize){
-
-	//	for (float py = startY; py < endY; py+=stepSize){
-
-	//		//Vertex
-	//		Vector *v = new Vector(px, this->baseHeight, py);
-	//		v->setNormal(0,1.0,0);
-	//		vertices.push_back(v);
-	//	}
-	//}
 }
 
 
@@ -338,9 +278,7 @@ void WaterPlane::update()
 			5  4
 
 			*/
-			if (pointsX > 100){
-				int a = 0;
-			}
+
 			nIndex = (y * pointsX) + x;
 			Vector vertex = vertices2[nIndex];
 			Vector newNormal = Vector();
@@ -436,6 +374,8 @@ WaterPlane::~WaterPlane(void){
 	deleteVBO(&vertexBuffer);
 	deleteVBO(&indexVertexBuffer);
 
+	delete [] vertices;
+	delete [] normals;
 	delete waveMap;
 	
 }
