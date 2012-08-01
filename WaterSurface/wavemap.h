@@ -53,12 +53,13 @@ public:
 	float getHeight(int x, int y);
 
 	virtual ~WaveMap(void);
+	WMatrix* newWave;
 
 protected:
 
 	WMatrix* tmp;
 	WMatrix* oldWave;
-	WMatrix* newWave;
+	
 
 	int pointsX;
 	int pointsY;

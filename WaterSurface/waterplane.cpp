@@ -71,6 +71,7 @@ void WaterPlane::createVBO(GLuint* vbo, int size)
 	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
 	glBufferData(GL_ARRAY_BUFFER, size, 0, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 }
 
 

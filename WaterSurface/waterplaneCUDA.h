@@ -9,6 +9,7 @@ class WMatrix;
 #include <vector>
 #include <cutil_inline.h>
 
+
 /**
  * Water surface
  *
@@ -47,6 +48,13 @@ protected:
 	Vector calculateNormalFor4Neighbours(int,int);
 
 	Vector calculateNormalFor8Neighbours(int,int);
+
+	struct cudaGraphicsResource *cuda_vertexVB_resource, *cuda_normalsVB_resource; // handles OpenGL-CUDA exchange
+	GLuint indexVertexBuffer;
+	GLuint vertexBuffer;
+
+	GLuint indexNormalBuffer;
+	GLuint normalBuffer;
 
 	float3 *cpu_vertices;
 	float3 *gpu_vertices;

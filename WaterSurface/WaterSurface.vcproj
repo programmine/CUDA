@@ -116,14 +116,17 @@
 			/>
 			<Tool
 				Name="Driver API Build Rule"
+				AdditionalOptions=""
+				GPUDebugInfo="true"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
 				Name="Cudart Build Rule"
-				Warning="1"
-				Optimization="0"
+				Warning="3"
+				Optimization="2"
+				Runtime="0"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -161,7 +164,7 @@
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib glu32.lib cudart.lib cuda.lib glew32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
-				LinkIncremental="0"
+				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="libcpmt.lib;libcmt.lib"

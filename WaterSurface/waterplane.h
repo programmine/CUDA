@@ -71,6 +71,13 @@ public:
 
 	~WaterPlane(void);
 
+private:
+	GLuint indexVertexBuffer;
+	GLuint vertexBuffer;
+
+	GLuint indexNormalBuffer;
+	GLuint normalBuffer;
+
 protected:
 
 	/**
@@ -149,11 +156,7 @@ protected:
 
 	float baseHeight;
 
-	GLuint indexVertexBuffer;
-	GLuint vertexBuffer;
 
-	GLuint indexNormalBuffer;
-	GLuint normalBuffer;
 
 
 	bool showEdges;

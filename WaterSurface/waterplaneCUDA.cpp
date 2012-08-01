@@ -1,13 +1,17 @@
+
+#include <windows.h>
+#include <math.h>
+#include <GL/glew.h>
+#include <cuda_runtime.h>
+#include <cutil_inline.h>
+#include <cutil_gl_inline.h>
+#include <cuda_gl_interop.h>
+#include <cstdlib>
+#include <iostream> 
 #include "wavemapCUDA.h"
 #include "vector.h"
 #include "waterplaneCUDA.h"
 #include "GPUFunctions.cuh"
-#include <windows.h>
-#include <math.h>
-#include <GL/glew.h>
-#include <cstdlib>
-#include <iostream> 
-
 
 
 
@@ -26,6 +30,9 @@ WaterPlaneCUDA::WaterPlaneCUDA():WaterPlane(){
 
 void WaterPlaneCUDA::configure(Vector upperLeft, Vector lowerRight, float dampFactor, float resolution)
 {
+
+	cudaSetDevice(cutGetMaxGflopsDeviceId());
+	cudaGLSetGLDevice(cutGetMaxGflopsDeviceId());
 
 	stepSize = 1.0/resolution;
 
@@ -72,6 +79,7 @@ void WaterPlaneCUDA::configure(Vector upperLeft, Vector lowerRight, float dampFa
 
 void WaterPlaneCUDA::update()
 {
+	size_t num_bytes; 
 	//update WaveMap
 	waveMap->updateWaveMap();
 	int vIndex = 0;
@@ -94,20 +102,32 @@ void WaterPlaneCUDA::update()
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, *&vertexBuffer);
-	glBufferData( GL_ARRAY_BUFFER, pointsY*pointsX*3*sizeof(float), cpu_vertices, GL_DYNAMIC_DRAW);
+	glBufferData( GL_ARRAY_BUFFER, pointsY*pointsX*sizeof(float3), cpu_vertices, GL_DYNAMIC_DRAW);
 
-	cutilSafeCall(cudaMemcpy(gpu_vertices,cpu_vertices,(pointsX*pointsX)*sizeof(float3),cudaMemcpyHostToDevice));
-	cutilSafeCall(cudaMemcpy(gpu_normals,cpu_normals,(pointsX*pointsX)*sizeof(float3),cudaMemcpyHostToDevice));
+	//cutilSafeCall(cudaMemcpy(gpu_vertices,cpu_vertices,(pointsX*pointsX)*sizeof(float3),cudaMemcpyHostToDevice));
+	//cutilSafeCall(cudaMemcpy(gpu_normals,cpu_normals,(pointsX*pointsX)*sizeof(float3),cudaMemcpyHostToDevice));
+
+	cutilSafeCall(cudaGraphicsMapResources(1, &cuda_vertexVB_resource, 0));
+	cutilSafeCall(cudaGraphicsResourceGetMappedPointer((void**)&gpu_vertices, &num_bytes, cuda_vertexVB_resource));
+
+	cutilSafeCall(cudaGraphicsMapResources(1, &cuda_normalsVB_resource, 0));
+	cutilSafeCall(cudaGraphicsResourceGetMappedPointer((void**)&gpu_normals, &num_bytes, cuda_normalsVB_resource));
+
+
 	cutilSafeCall(cudaMemcpy(DIM,&pointsX,sizeof(unsigned int),cudaMemcpyHostToDevice));
 	updateNormalsGPU1(gpu_vertices,gpu_normals,DIM);
+
+	cutilSafeCall(cudaGraphicsUnmapResources(1, &cuda_vertexVB_resource, 0));
+	cutilSafeCall(cudaGraphicsUnmapResources(1, &cuda_normalsVB_resource, 0));
+
 	//cutilSafeCall(cudaMemcpy(cpu_vertices,gpu_vertices,(pointsX*pointsX)*sizeof(float3),cudaMemcpyDeviceToHost));
-	cutilSafeCall(cudaMemcpy(cpu_normals,gpu_normals,(pointsX*pointsX)*sizeof(float3),cudaMemcpyDeviceToHost));
+	//cutilSafeCall(cudaMemcpy(cpu_normals,gpu_normals,(pointsX*pointsX)*sizeof(float3),cudaMemcpyDeviceToHost));
 
 	
 	
 
 	glBindBuffer(GL_ARRAY_BUFFER, *&normalBuffer);
-	glBufferData( GL_ARRAY_BUFFER, pointsY*pointsX*3*sizeof(float), cpu_normals, GL_DYNAMIC_DRAW);
+	glBufferData( GL_ARRAY_BUFFER, pointsY*pointsX*sizeof(float3), cpu_normals, GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -197,7 +217,6 @@ void WaterPlaneCUDA::drawTriangle(float3 p1,float3 p2,float3 p3,float3 n1,float3
 
 void WaterPlaneCUDA::initBuffer()
 {
-
 	//Start und Endkoordinaten für x-Richtung
 	float startX = this->uLeft.x;
 	float endX = this->lRight.x;
@@ -221,16 +240,19 @@ void WaterPlaneCUDA::initBuffer()
 		}
 	}
 
-	createVBO(&vertexBuffer, pointsX*pointsY*sizeof(float)*3);
-	createVBO(&normalBuffer, pointsX*pointsY*sizeof(float)*3);
+
+	createVBO(&vertexBuffer, pointsX*pointsY*sizeof(float3));
+	cutilSafeCall(cudaGraphicsGLRegisterBuffer(&cuda_vertexVB_resource, vertexBuffer, cudaGraphicsMapFlagsWriteDiscard));
+	createVBO(&normalBuffer, pointsX*pointsY*sizeof(float3));
+	cutilSafeCall(cudaGraphicsGLRegisterBuffer(&cuda_normalsVB_resource, normalBuffer, cudaGraphicsMapFlagsWriteDiscard));
 	createMeshIndexBuffer(&indexVertexBuffer, pointsX, pointsY);
 	createMeshIndexBuffer(&indexNormalBuffer, pointsX, pointsY);
 
 	glBindBuffer(GL_ARRAY_BUFFER, *&vertexBuffer);
-	glBufferData( GL_ARRAY_BUFFER, pointsY*pointsX*3*sizeof(float), cpu_vertices, GL_DYNAMIC_DRAW);
+	glBufferData( GL_ARRAY_BUFFER, pointsY*pointsX*sizeof(float3), cpu_vertices, GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, *&normalBuffer);
-	glBufferData( GL_ARRAY_BUFFER, pointsY*pointsX*3*sizeof(float), cpu_normals, GL_DYNAMIC_DRAW);
+	glBufferData( GL_ARRAY_BUFFER, pointsY*pointsX*sizeof(float3), cpu_normals, GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -239,5 +261,7 @@ void WaterPlaneCUDA::initBuffer()
 WaterPlaneCUDA::~WaterPlaneCUDA(){
 	cudaFree(gpu_normals);
 	cudaFree(gpu_vertices);
+	cutilSafeCall(cudaGraphicsUnregisterResource(cuda_vertexVB_resource));
+	cutilSafeCall(cudaGraphicsUnregisterResource(cuda_normalsVB_resource));
 	cudaFree(DIM);
 }

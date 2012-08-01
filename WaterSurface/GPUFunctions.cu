@@ -5,8 +5,9 @@
 #include <cutil_math.h>
 
 __global__ void updateWaveMapGPU2( float* dev_newWave, float* dev_oldWave,unsigned int *dev_arraySize, unsigned int *dev_arrayDIM){
-		int tid= blockIdx.x;
-		while (tid < *dev_arraySize){
+		int tid = threadIdx.x + blockIdx.x * blockDim.x;
+		while (tid < (*dev_arraySize)){
+		
 			int y = int(tid / *dev_arrayDIM);
 			int x = tid % *dev_arrayDIM;
 			int up = (x - 1) + (y * *dev_arrayDIM);
@@ -38,19 +39,20 @@ __global__ void updateWaveMapGPU2( float* dev_newWave, float* dev_oldWave,unsign
 			n = n*2 - dev_newWave[tid];
 			n = n - (n/32.0f);
 			dev_newWave[tid] = n;
-			tid += gridDim.x;
+			tid += gridDim.x*blockDim.x;
 		}
 }
 
 void updateWaveMapGPU1(float* dev_newWave, float* dev_oldWave,unsigned int *dev_arraySize, unsigned int *dev_arrayDIM){
-	updateWaveMapGPU2<<< 5000 ,1 >>>(dev_newWave,dev_oldWave,dev_arraySize,dev_arrayDIM);
+	updateWaveMapGPU2<<< 5000,1 >>>(dev_newWave,dev_oldWave,dev_arraySize,dev_arrayDIM);
 }
+
 
 
 __global__ void updateNormalsGPU2( float3* dev_vertices, float3* dev_normals,unsigned int *dev_DIM){
 
 	int nIndex;
-	int tid= blockIdx.x;
+	int tid= threadIdx.x + blockIdx.x * blockDim.x;
 	
 	
 	while (tid < (*dev_DIM* *dev_DIM)){
@@ -111,7 +113,7 @@ __global__ void updateNormalsGPU2( float3* dev_vertices, float3* dev_normals,uns
 			}
 		}
 		dev_normals[nIndex] = normalize(newNormal);
-		tid += gridDim.x;
+		tid += gridDim.x*blockDim.x;
 	}
 	
 	
@@ -121,6 +123,6 @@ __global__ void updateNormalsGPU2( float3* dev_vertices, float3* dev_normals,uns
 }
 
 void updateNormalsGPU1(float3* dev_vertices, float3* dev_normals,unsigned int *dev_DIM){
-	updateNormalsGPU2<<<15000,1>>>(dev_vertices,dev_normals,dev_DIM);
+	updateNormalsGPU2<<<5000,5000>>>(dev_vertices,dev_normals,dev_DIM);
 }
 
