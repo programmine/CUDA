@@ -60,7 +60,7 @@ public:
 	 * @param height defines how heigh/low the circular area is pushed
 	 * 
 	 */
-	void disturbArea(float xmin, float zmin, float xmax, float zmax, float height);
+	virtual void disturbArea(float xmin, float zmin, float xmax, float zmax, float height);
 
 	/**
 	*

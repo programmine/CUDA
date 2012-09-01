@@ -4,9 +4,11 @@
 #include <cutil_inline.h>
 #include <cutil_math.h>
 
-__global__ void updateWaveMapGPU2( float* dev_newWave, float* dev_oldWave,unsigned int *dev_arraySize, unsigned int *dev_arrayDIM){
-		int tid = threadIdx.x + blockIdx.x * blockDim.x;
-		while (tid < (*dev_arraySize)){
+
+
+__global__ void updateWaveMapGPU2( float3* dev_newWave, float3* dev_oldWave, unsigned int *dev_arrayDIM){
+		int tid = threadIdx.x + (blockIdx.x * blockDim.x);
+		while (tid < (*dev_arrayDIM* *dev_arrayDIM)){
 		
 			int y = int(tid / *dev_arrayDIM);
 			int x = tid % *dev_arrayDIM;
@@ -19,32 +21,32 @@ __global__ void updateWaveMapGPU2( float* dev_newWave, float* dev_oldWave,unsign
 			float n = 0.0f;
 			int no=1;
 			if (x-1 >= 0) {
-				n += dev_oldWave[up]; 
+				n += dev_oldWave[up].y; 
 				no++;
 			}
 			if (x + 1 < *dev_arrayDIM) {
-				n += dev_oldWave[down]; 
+				n += dev_oldWave[down].y; 
 				no++;
 			}
 			if (y-1 >= 0) {
-				n += dev_oldWave[leftp]; 
+				n += dev_oldWave[leftp].y; 
 				no++;
 			}
 			if (y+1 < *dev_arrayDIM) {
 				no++;
-				n += dev_oldWave[rightp]; 
+				n += dev_oldWave[rightp].y; 
 			}
 			
 			n = n/(float)no;
-			n = n*2 - dev_newWave[tid];
+			n = n*2 - dev_newWave[tid].y;
 			n = n - (n/32.0f);
-			dev_newWave[tid] = n;
+			dev_newWave[tid].y = n;
 			tid += gridDim.x*blockDim.x;
 		}
 }
 
-void updateWaveMapGPU1(float* dev_newWave, float* dev_oldWave,unsigned int *dev_arraySize, unsigned int *dev_arrayDIM){
-	updateWaveMapGPU2<<< 5000,1 >>>(dev_newWave,dev_oldWave,dev_arraySize,dev_arrayDIM);
+void updateWaveMapGPU1(float3* dev_newWave, float3* dev_oldWave, unsigned int *dev_arrayDIM){
+	updateWaveMapGPU2<<< 50,50 >>>(dev_newWave,dev_oldWave,dev_arrayDIM);
 }
 
 
@@ -123,6 +125,6 @@ __global__ void updateNormalsGPU2( float3* dev_vertices, float3* dev_normals,uns
 }
 
 void updateNormalsGPU1(float3* dev_vertices, float3* dev_normals,unsigned int *dev_DIM){
-	updateNormalsGPU2<<<5000,5000>>>(dev_vertices,dev_normals,dev_DIM);
+	updateNormalsGPU2<<<50,50>>>(dev_vertices,dev_normals,dev_DIM);
 }
 

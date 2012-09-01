@@ -377,7 +377,7 @@ WaterPlane::~WaterPlane(void){
 
 	delete [] vertices;
 	delete [] normals;
-	delete waveMap;
+	if(waveMap) delete waveMap;
 	
 }
 

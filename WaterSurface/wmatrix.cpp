@@ -12,17 +12,11 @@ WMatrix::WMatrix(unsigned int columns, unsigned int rows)
 
 	this->rowCount = rows;
 
-	Values = new float*[columns];
-
-	for (unsigned int i = 0; i< columns; i++){
-		Values[i] = new float[rows];
-	}
+	Values = new float[columns*rows];
 
 	//Initialisiere mit 0.0
-	for (unsigned int column = 0; column < columns; column++){
-		for (unsigned int row = 0; row < rows; row++){
-			Values[column][row] = 0.0;
-		}
+	for (unsigned int i = 0; i < (columns*rows); i++){
+		Values[i] = 0.0;
 	}
 }
 
@@ -35,12 +29,14 @@ void WMatrix::setElement(int column, int row, float value)
 {
 	if ((row >= rowCount)||(row < 0)) return;
 	if ((column >= columnCount)||(column < 0)) return;
-	Values[column][row] = value;
+	int index = columnCount*column + row;
+	Values[index] = value;
 }
 
 float WMatrix::getElement(int column, int row)
 {
-	return Values[column][row];
+	int index = columnCount*column + row;
+	return Values[index];
 }
 
 int WMatrix::getColumnCount()
@@ -60,7 +56,7 @@ void WMatrix::printMatrix()
 
 		for (unsigned int column = 0; column < columnCount; column++){
 
-			std::cout<<"| "<<Values[column][row];
+			//std::cout<<"| "<<Values[column][row];
 		}
 		std::cout << " |" << std::endl;
 	}

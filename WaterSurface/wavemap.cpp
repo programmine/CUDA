@@ -16,6 +16,11 @@ WaveMap::WaveMap(int pX, int pY, float damp)
 	this->pointsY = pY;
 }
 
+WaveMap::WaveMap()
+{
+
+}
+
 float WaveMap::getHeight(int x, int y)
 {
 	return newWave->getElement(x, y);

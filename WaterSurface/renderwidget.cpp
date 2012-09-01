@@ -16,7 +16,11 @@
 RenderWidget::RenderWidget(QWidget * parent)
 : QGLWidget(parent) 
 {
-	setFormat(QGLFormat(QGL::SampleBuffers | QGL::DepthBuffer));
+	QGLFormat newFormat;
+	newFormat.setSampleBuffers(true);
+	newFormat.setDepth(true);
+
+	setFormat(newFormat);
 	setFocusPolicy(Qt::StrongFocus);
 	width=1024;
 	height=768;
@@ -35,7 +39,7 @@ RenderWidget::RenderWidget(QWidget * parent)
 	disturbAreaMin = 1.30f;
 	disturbAreaMax = 1.60f;
 	disturbHeight = 0.1f;
-	resolution = 40;
+	resolution = 64;
 	damping = 32;
 	surfaceSize = 5.0;
 	waveSize = 0.1;
@@ -290,8 +294,8 @@ void RenderWidget::paintGL()
 	glTranslatef(-surfaceSize/2.0,0,-surfaceSize/2.0);
 	waterplane->update();
 	waterplane->drawMesh();
+	
 	glTranslatef(surfaceSize/2.0,0,surfaceSize/2.0);
-
 	drawFPS();
 	update();
 }
@@ -299,11 +303,11 @@ void RenderWidget::paintGL()
 
 void RenderWidget::initializeGL()
 {
-	
 	glEnable(GL_DEPTH_TEST);
 	initializeLights();
 	glewInit();
-	waterplane=WaterPlaneCUDA::getWaterPlane();
+
+	waterplane=WaterPlane::getWaterPlane();
 	waterplane->configure(Vector(0,0,0),Vector(surfaceSize,0,surfaceSize),damping,resolution);
 	waterplane->update();
 }

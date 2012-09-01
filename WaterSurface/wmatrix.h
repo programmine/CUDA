@@ -16,35 +16,36 @@ public:
 	/**
 	 * Gibt den Wert des jeweiligen Elements zurück.
 	 */
-	float getElement(int column, int row);
+	virtual float getElement(int column, int row);
 
 	/**
 	 * Setzt den Wert des jeweiligen Elements zurück.
 	 */
-	void setElement(int column, int row, float value);
+	virtual void setElement(int column, int row, float value);
 
 	/**
 	 * Die Größe der Matrix.
 	 */
-	int getSize(void);
+	virtual int getSize(void);
 
 	/**
 	 * Anzahl der Zeilen.
 	 */
-	int getRowCount(void);
+	virtual int getRowCount(void);
 
 	/**
 	 * Anzahl der Spalten.
 	 */
-	int getColumnCount(void);
+	virtual int getColumnCount(void);
 
-	void printMatrix(void);
+	virtual void printMatrix(void);
 
-public:
-	~WMatrix(void);
-	float** Values;
+	virtual ~WMatrix(void);
+
+	float* Values;
 
 private:
+
 	unsigned int rowCount;
 	unsigned int columnCount;
 

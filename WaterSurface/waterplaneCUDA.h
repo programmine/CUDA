@@ -27,16 +27,16 @@ public:
 
 	virtual void drawMesh(void);
 
-	void drawTriangle(float3,float3,float3,float3,float3,float3);
-
 	/**
 	 * returns instance of WaterPlaneCUDA
 	 */
 	static WaterPlane* getWaterPlane();
 
+	virtual void disturbArea(float xmin, float zmin, float xmax, float zmax, float height);
+
 	virtual void configure(Vector upperLeft, Vector lowerRight, float dampFactor, float resolution);
 
-	virtual ~WaterPlaneCUDA(void);
+	~WaterPlaneCUDA(void);
 
 protected:
 	WaterPlaneCUDA();
@@ -45,19 +45,18 @@ protected:
 	 */
 	void initBuffer(void);
 
-	Vector calculateNormalFor4Neighbours(int,int);
-
-	Vector calculateNormalFor8Neighbours(int,int);
-
-	struct cudaGraphicsResource *cuda_vertexVB_resource, *cuda_normalsVB_resource; // handles OpenGL-CUDA exchange
+	struct cudaGraphicsResource *cuda_newVertex_resource, *cuda_oldVertex_resource, *cuda_normalsVB_resource; // handles OpenGL-CUDA exchange
 	GLuint indexVertexBuffer;
-	GLuint vertexBuffer;
+	GLuint newVertexBuffer;
+	GLuint oldVertexBuffer;
 
 	GLuint indexNormalBuffer;
 	GLuint normalBuffer;
 
-	float3 *cpu_vertices;
-	float3 *gpu_vertices;
+	float3 *cpu_newVertices;
+	float3 *gpu_newVertices;
+	float3 *cpu_oldVertices;
+	float3 *gpu_oldVertices;
 	float3 *cpu_normals;
 	float3 *gpu_normals;
 	unsigned int *DIM;

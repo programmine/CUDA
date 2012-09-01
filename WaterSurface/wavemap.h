@@ -21,6 +21,7 @@ public:
 	 * Dieser wird für die Berechnung der Welle bzw. deren Ausdehnung herangezogen.
 	 */
 	WaveMap(int pX, int pY, float damp);
+	WaveMap();
 
 	/**
 	 * Vertauscht die beiden Buffer in ihrer Rolle.
@@ -50,17 +51,16 @@ public:
 	/** 
 	 * Höhenwert an Stelle (x,y)
 	 */
-	float getHeight(int x, int y);
+	virtual float getHeight(int x, int y);
 
 	virtual ~WaveMap(void);
-	WMatrix* newWave;
 
 protected:
-
+	WMatrix* newWave;
 	WMatrix* tmp;
 	WMatrix* oldWave;
 	
-
+protected:
 	int pointsX;
 	int pointsY;
 	

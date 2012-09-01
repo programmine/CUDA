@@ -26,14 +26,14 @@ public:
 	virtual ~WaveMapCUDA(void);
 
 private:
+
 	float* dev_oldWave;
 	float* dev_newWave;
+
 	unsigned int *rowSize;
 	unsigned int *arraySize;
 	unsigned int *dev_arraySize;
 	unsigned int *dev_arrayDIM;
-	float* From2DTo1D(float** array2D, unsigned int size, float* array1D);
-	float** From1DTo2D(float* array1D, unsigned int size, float** array2D);
 
 };
 #endif
