@@ -11,7 +11,6 @@
 #include "wavemapCUDA.h"
 #include "vector.h"
 #include "waterplaneCUDA.h"
-#include "GPUFunctions.cuh"
 
 static unsigned long inKB(unsigned long bytes)
 { return bytes/1024; }
@@ -65,18 +64,18 @@ void WaterPlaneCUDA::configure(Vector upperLeft, Vector lowerRight, float dampFa
 	}
 
 
-	stepSize = 1.0/resolution;
+	this->stepSize = 1.0f/resolution;
 
-	resolutionFactor = resolution;
+	this->resolutionFactor = resolution;
 
 	//reale Z - Achse ist x - Achse der WaterPlaneCUDA
-	sizeX = (unsigned int) abs(upperLeft.z - lowerRight.z);
+	this->sizeX = (unsigned int) abs(upperLeft.z - lowerRight.z);
 
 	//reale X -Achse ist y- Achse der WaterPlaneCUDA
-	sizeY = (unsigned int) abs(upperLeft.x - lowerRight.x);
+	this->sizeY = (unsigned int) abs(upperLeft.x - lowerRight.x);
 
 	//Anzahl der Netzpunkte in X -Richtung
-	pointsX = (unsigned int)(sizeX * resolution);
+	this->pointsX = (unsigned int)(sizeX * resolution);
 
 	//Anzahl der Netzpunkte in Y -Richtung
 	pointsY = (unsigned int)(sizeY * resolution);
@@ -97,7 +96,7 @@ void WaterPlaneCUDA::configure(Vector upperLeft, Vector lowerRight, float dampFa
 	gpu_oldVertices = new float3[pointsX*pointsY];
 	gpu_normals = new float3[pointsX*pointsY];
 
-	for (unsigned int i=0;i<pointsX*pointsY;i++) {
+	for (int i=0;i<pointsX*pointsY;i++) {
 		gpu_newVertices[i]=make_float3(0,0,0);
 		gpu_oldVertices[i]=make_float3(0,0,0);
 		gpu_normals[i]=make_float3(0,1.0,0);
@@ -105,46 +104,57 @@ void WaterPlaneCUDA::configure(Vector upperLeft, Vector lowerRight, float dampFa
 	cutilSafeCall(cudaMalloc((void**)&gpu_newVertices,pointsX*pointsY*sizeof(float3)));
 	cutilSafeCall(cudaMalloc((void**)&gpu_oldVertices,pointsX*pointsY*sizeof(float3)));
 	cutilSafeCall(cudaMalloc((void**)&gpu_normals,pointsX*pointsY*sizeof(float3)));
-	cutilSafeCall(cudaMalloc((void**)&DIM,sizeof(unsigned int)));
 
 	drawMesh();
 }
 
 void WaterPlaneCUDA::disturbArea(float xmin, float zmin, float xmax, float zmax, float height)
 {
-	if ((zmin < this->uLeft.z) || (zmin > this->lRight.z)) return;
-	if ((xmin < this->uLeft.x) || (xmin > this->lRight.x)) return;
-
-	float radius = (float)(getWaterPlaneX(xmax)-getWaterPlaneX(xmin))/2.0f;
+	float radius = (float)(getWaterPlaneX(xmax-xmin))/2.0f;
 	if (radius <= 0) radius = 1;
 	float centerX = (float)getWaterPlaneX((xmax+xmin)/2.0f);
 	float centerZ = (float)getWaterPlaneY((zmax+zmin)/2.0f);
+
+	if ((((zmax+zmin)/2.0f) < this->uLeft.z) || (((zmax+zmin)/2.0f) > this->lRight.z)) return;
+	if ((((xmax+xmin)/2.0f) < this->uLeft.x) || (((xmax+xmin)/2.0f) > this->lRight.x)) return;
+
 	float r2 = radius * radius;
 
-	unsigned int xminW = getWaterPlaneX(xmin);
-	unsigned int zminW = getWaterPlaneY(zmin);
-	unsigned int xmaxW = getWaterPlaneX(xmax);
-	unsigned int zmaxW = getWaterPlaneY(zmax);
+	int xminW = getWaterPlaneX(xmin);
+	int zminW = getWaterPlaneY(zmin);
+	int xmaxW = getWaterPlaneX(xmax);
+	int zmaxW = getWaterPlaneY(zmax);
+
+	if (xminW >= pointsX) xminW = pointsX-1;
+	if (zminW >= pointsX) zminW = pointsX-1;
+	if (xmaxW >= pointsX) xmaxW = pointsX-1;
+	if (zmaxW >= pointsX) zmaxW = pointsX-1;
+
+	if (xminW < 0) xminW = 0;
+	if (zminW < 0) zminW = 0;
+	if (xmaxW < 0) xmaxW = 0;
+	if (zmaxW < 0) zmaxW = 0;
 
 	glBindBuffer(GL_ARRAY_BUFFER, oldVertexBuffer);
 	float3* verticesTest = (float3*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 
 
-	for(unsigned int x = xminW; x <= xmaxW; x++)
+	for(int x = xminW; x <= xmaxW; x++)
 	{
-		for (unsigned int y = zminW; y <= zmaxW; y++)
+		for (int y = zminW; y <= zmaxW; y++)
 		{
 			float insideCircle = ((x-centerX)*(x-centerX))+((y-centerZ)*(y-centerZ))-r2;
 
 			if (insideCircle <= 0) {
 				int vIndex = (y * pointsX) + x;
-				if (vIndex < (pointsX*pointsY)) verticesTest[vIndex].y = (insideCircle/r2)*height;
+				if (vIndex < (pointsX*pointsY)) {
+					verticesTest[vIndex].y = (insideCircle/r2)*height;
+				}
 			}
 		} 
 	}
-	glBindBuffer(GL_ARRAY_BUFFER, *&oldVertexBuffer);
-	glBufferData( GL_ARRAY_BUFFER, pointsY*pointsX*sizeof(float3), verticesTest, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glUnmapBufferARB(GL_ARRAY_BUFFER);
+
 
 }
 
@@ -156,24 +166,24 @@ void WaterPlaneCUDA::update()
 	cutilSafeCall(cudaGraphicsResourceGetMappedPointer((void**)&gpu_newVertices, &num_bytes, cuda_newVertex_resource));
 	cutilSafeCall(cudaGraphicsMapResources(1, &cuda_oldVertex_resource, 0));
 	cutilSafeCall(cudaGraphicsResourceGetMappedPointer((void**)&gpu_oldVertices, &num_bytes, cuda_oldVertex_resource));
-	cutilSafeCall(cudaMemcpy(DIM,&pointsX,sizeof(unsigned int),cudaMemcpyHostToDevice));
-	updateWaveMapGPU1(gpu_newVertices,gpu_oldVertices, DIM);
+	cutilSafeCall(cudaMemcpyToSymbol("DIM",&pointsX,sizeof(int)));
+	updateWaveMapGPU1(gpu_newVertices,gpu_oldVertices);
 	cutilSafeCall(cudaGraphicsUnmapResources(1, &cuda_newVertex_resource, 0));
 	cutilSafeCall(cudaGraphicsUnmapResources(1, &cuda_oldVertex_resource, 0));
 	
-	//swap between old and new wave map
-	struct cudaGraphicsResource *temp = cuda_oldVertex_resource;
-	cuda_oldVertex_resource = cuda_newVertex_resource;
-	cuda_newVertex_resource = temp;
-
 	cutilSafeCall(cudaGraphicsMapResources(1, &cuda_oldVertex_resource, 0));
 	cutilSafeCall(cudaGraphicsResourceGetMappedPointer((void**)&gpu_oldVertices, &num_bytes, cuda_oldVertex_resource));
 	cutilSafeCall(cudaGraphicsMapResources(1, &cuda_normalsVB_resource, 0));
 	cutilSafeCall(cudaGraphicsResourceGetMappedPointer((void**)&gpu_normals, &num_bytes, cuda_normalsVB_resource));
-	cutilSafeCall(cudaMemcpy(DIM,&pointsX,sizeof(unsigned int),cudaMemcpyHostToDevice));
-	updateNormalsGPU1(gpu_oldVertices,gpu_normals,DIM);
+	cutilSafeCall(cudaMemcpyToSymbol("DIM",&pointsX,sizeof(int)));
+	updateNormalsGPU1(gpu_oldVertices,gpu_normals);
 	cutilSafeCall(cudaGraphicsUnmapResources(1, &cuda_normalsVB_resource, 0));
 	cutilSafeCall(cudaGraphicsUnmapResources(1, &cuda_oldVertex_resource, 0));
+
+	//swap between old and new wave map
+	struct cudaGraphicsResource *temp = cuda_oldVertex_resource;
+	cuda_oldVertex_resource = cuda_newVertex_resource;
+	cuda_newVertex_resource = temp;
 }
 
 
@@ -279,5 +289,5 @@ WaterPlaneCUDA::~WaterPlaneCUDA(){
 	cutilSafeCall(cudaGraphicsUnregisterResource(cuda_newVertex_resource));
 	cutilSafeCall(cudaGraphicsUnregisterResource(cuda_oldVertex_resource));
 	cutilSafeCall(cudaGraphicsUnregisterResource(cuda_normalsVB_resource));
-	cudaFree(DIM);
+	//cudaFree(DIM);
 }

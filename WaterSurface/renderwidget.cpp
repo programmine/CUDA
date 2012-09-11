@@ -39,7 +39,7 @@ RenderWidget::RenderWidget(QWidget * parent)
 	disturbAreaMin = 1.30f;
 	disturbAreaMax = 1.60f;
 	disturbHeight = 0.1f;
-	resolution = 64;
+	resolution = 64.0f;
 	damping = 32;
 	surfaceSize = 5.0;
 	waveSize = 0.1;
@@ -61,7 +61,7 @@ void RenderWidget::changeWaveSettings(float waveSize, float waveIntensity){
 }
 
 
-void RenderWidget::drawFPS(void)
+float RenderWidget::getFPS(void)
 {
 	frameCount++;
 	currentTime = glutGet(GLUT_ELAPSED_TIME);
@@ -81,7 +81,7 @@ void RenderWidget::drawFPS(void)
 		frameCount = 0;
 	}
 	emit frameCounterChanged(fps);
-
+	return timeInterval;
 }
 
 
@@ -292,11 +292,13 @@ void RenderWidget::paintGL()
 	
 	gluLookAt (Cx, -Cy, Cz, 0.0, 0, 0.0, 0, 1.0, 0.0);
 	glTranslatef(-surfaceSize/2.0,0,-surfaceSize/2.0);
+
+	float timePassed = getFPS();
 	waterplane->update();
 	waterplane->drawMesh();
 	
 	glTranslatef(surfaceSize/2.0,0,surfaceSize/2.0);
-	drawFPS();
+	
 	update();
 }
 
@@ -307,7 +309,7 @@ void RenderWidget::initializeGL()
 	initializeLights();
 	glewInit();
 
-	waterplane=WaterPlane::getWaterPlane();
+	waterplane=WaterPlaneCUDA::getWaterPlane();
 	waterplane->configure(Vector(0,0,0),Vector(surfaceSize,0,surfaceSize),damping,resolution);
 	waterplane->update();
 }

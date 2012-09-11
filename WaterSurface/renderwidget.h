@@ -59,7 +59,7 @@ private:
 	bool clicked;
 	void drawAxis();
 	void printw(float x, float y, float z, char* format, float fps);
-	void drawFPS(void);
+	float getFPS(void);
 	void mouseDisturbSurface(QPoint);
 	
 };

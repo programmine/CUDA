@@ -8,7 +8,7 @@ class WMatrix;
 #include "waterplane.h"
 #include <vector>
 #include <cutil_inline.h>
-
+#include "GPUFunctions.cuh"
 
 /**
  * Water surface
@@ -59,7 +59,6 @@ protected:
 	float3 *gpu_oldVertices;
 	float3 *cpu_normals;
 	float3 *gpu_normals;
-	unsigned int *DIM;
 
 };
 
