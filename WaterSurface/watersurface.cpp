@@ -44,13 +44,21 @@ WaterSurface::WaterSurface(QWidget *parent, Qt::WFlags flags)
 	framecounter = new QLabel("FPS");
 	QObject::connect(renderWidget, SIGNAL(frameCounterChanged(float)),this, SLOT(setFrameCounter(float)));
 
+	mode = new QComboBox();
+	mode->insertItem(0, "Normal");
+	mode->insertItem(1, "Rain");
+
+	QObject::connect(mode,SIGNAL(currentIndexChanged(int)),this,SLOT(WaterModeChanges(int)));
+
 	controlLayout->addWidget(checkbox,1,3);
-	controlLayout->addWidget(new QLabel("To rotate the scene press CTRL+mouse movement"),2,3);
+	controlLayout->addWidget(new QLabel("Water Mode"),2,3);
+	controlLayout->addWidget(mode,2,4);
 	controlLayout->addWidget(reset,3,1);
 	controlLayout->addWidget(framecounter,3,2);
 	setCentralWidget(centralWidget);
-	mainLayout->addLayout(controlLayout);
-	mainLayout->addWidget(renderWidget);  
+	mainLayout->addLayout(controlLayout,3);
+	mainLayout->addWidget(renderWidget,3);  
+	mainLayout->addWidget(new QLabel("To change camera use CTRL + left/right mouse button"),0); 
 	setWindowTitle(tr("Water Surface"));
 	resize(1044,800);
 }
@@ -83,6 +91,11 @@ void WaterSurface::toggleEdges(int state)
 void WaterSurface::setFrameCounter(float fps)
 {
 	framecounter->setText(QString("       <b><big>%1 FPS</big></b>").arg(fps));
+}
+
+void WaterSurface::WaterModeChanges(int index)
+{
+	renderWidget->setWaterMode(index);
 }
 
 WaterSurface::~WaterSurface()

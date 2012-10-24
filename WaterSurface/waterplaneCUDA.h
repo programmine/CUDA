@@ -2,8 +2,8 @@
 #define WATERPLANECUDA_H
 
 
-class WaveMap;
 class WMatrix;
+class Disturbances;
 #include "vector.h"
 #include "waterplane.h"
 #include <vector>
@@ -25,6 +25,9 @@ public:
 	 */
 	virtual void update(void);
 
+	/**
+	 * draws mesh
+	 */
 	virtual void drawMesh(void);
 
 	/**
@@ -32,8 +35,27 @@ public:
 	 */
 	static WaterPlane* getWaterPlane();
 
+	/**
+	 * method to disturb circular area of surface.
+	 *
+	 * @param xmin lower x value of aquare which contain circular area to disturb surface
+	 * @param zmin lower z value of aquare which contain circular area to disturb surface
+	 * @param xmax higher x value of aquare which contain circular area to disturb surface
+	 * @param zmax higher z value of aquare which contain circular area to disturb surface
+	 * @param height defines how heigh/low the circular area is pushed
+	 * 
+	 */
 	virtual void disturbArea(float xmin, float zmin, float xmax, float zmax, float height);
 
+	/**
+	 *
+	 * Initialises the water plane
+	 * 
+	 * @param upperLeft, lowerRight defines size of waterplane
+	 * @param dampFactor expansion of the created waves
+	 * @param resolution describes how many grid points are created per scaling unit
+	 * 
+	 */
 	virtual void configure(Vector upperLeft, Vector lowerRight, float dampFactor, float resolution);
 
 	~WaterPlaneCUDA(void);
@@ -53,12 +75,16 @@ protected:
 	GLuint indexNormalBuffer;
 	GLuint normalBuffer;
 
+	int timePassed;
+	int timeSinceLast;
+
 	float3 *cpu_newVertices;
 	float3 *gpu_newVertices;
 	float3 *cpu_oldVertices;
 	float3 *gpu_oldVertices;
 	float3 *cpu_normals;
 	float3 *gpu_normals;
+	std::vector<Disturbances*> disturbances;
 
 };
 

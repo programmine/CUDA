@@ -11,6 +11,7 @@
 #include <QtOpenGL>
 #include <iostream>
 #include <math.h> 
+#include <time.h>
 
 
 RenderWidget::RenderWidget(QWidget * parent)
@@ -30,19 +31,23 @@ RenderWidget::RenderWidget(QWidget * parent)
 	frameCount = 0;
 	currentTime = 0;
 	previousTime = 0;
+	waveTimeCounter = 0;
 	fps = 0.0f;
 
-	radius = 4.0f;	
+	radius = 5.0f;	
 	theta  = (2.8f * M_PI) / 2.0f;
 	phi = M_PI/1.2f;
 
 	disturbAreaMin = 1.30f;
 	disturbAreaMax = 1.60f;
 	disturbHeight = 0.1f;
-	resolution = 64.0f;
-	damping = 32;
+	resolution = 32.0f;
+	damping = 16;
 	surfaceSize = 5.0;
 	waveSize = 0.1;
+	waterMode = 0;
+
+	srand ( time(NULL) );
 
 	clicked=false;
 
@@ -174,7 +179,6 @@ void RenderWidget::mouseDisturbSurface(QPoint lastPos)
 	double surfacePointX = dXfrom + t*dXDir;
 	double surfacePointY = 0;
 	double surfacePointZ = dZfrom + t*dZDir;
-
 	waterplane->disturbArea(surfacePointZ+(surfaceSize/2.0-waveSize),surfacePointX+(surfaceSize/2.0-waveSize),surfacePointZ+(surfaceSize/2.0+waveSize),surfacePointX+(surfaceSize/2.0+waveSize),disturbHeight);
 
 }
@@ -213,6 +217,11 @@ void RenderWidget::keyPressEvent (QKeyEvent * event)
 void RenderWidget::toggleEdges()
 {
 	waterplane->toggleEdges();
+}
+
+void RenderWidget::setWaterMode(int mode)
+{
+	waterMode = mode;
 }
 
 void RenderWidget::render()
@@ -279,9 +288,23 @@ void RenderWidget::drawAxis()
 
 }
 
+void RenderWidget::applyWaterMode(){
+	float xPos = 0;
+	float zPos = 0;
+	float curWaveTime = 0;
+	switch(waterMode){
+		case 0: break;
+		default: 
+			xPos = (rand() % 500 + 1) / 100.0f;
+			zPos = (rand() % 500 + 1) / 100.0f;
+			waterplane->disturbArea(xPos-waveSize/1.5f,zPos-waveSize/1.5f,xPos+waveSize/1.5f,zPos+waveSize/1.5f,disturbHeight/2.0f);
+			break;
+	}
+}
+
 void RenderWidget::paintGL()
 {
-
+	applyWaterMode();
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glLoadIdentity(); 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); 
@@ -309,7 +332,7 @@ void RenderWidget::initializeGL()
 	initializeLights();
 	glewInit();
 
-	waterplane=WaterPlaneCUDA::getWaterPlane();
+	waterplane=WaterPlane::getWaterPlane();
 	waterplane->configure(Vector(0,0,0),Vector(surfaceSize,0,surfaceSize),damping,resolution);
 	waterplane->update();
 }

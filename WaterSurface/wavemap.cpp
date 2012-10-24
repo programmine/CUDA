@@ -40,7 +40,6 @@ void WaveMap::updateWaveMap()
 	{
 		for (int y = 0; y < pointsY; y++)
 		{
-			//my forumla
 
 			n = 0;
 			int no=0;
@@ -72,7 +71,6 @@ void WaveMap::updateWaveMap()
 	}
 	
 	this->swap();
-	//this->print();
 }
 
 void WaveMap::swap()

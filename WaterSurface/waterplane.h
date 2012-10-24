@@ -36,6 +36,7 @@ public:
 	 *
 	 * Initialises the water plane
 	 * 
+	 * @param upperLeft, lowerRight defines size of waterplane
 	 * @param dampFactor expansion of the created waves
 	 * @param resolution describes how many grid points are created per scaling unit
 	 * 
@@ -61,7 +62,6 @@ public:
 	 * 
 	 */
 	virtual void disturbArea(float xmin, float zmin, float xmax, float zmax, float height);
-
 	/**
 	*
 	* show/hide triangle edges of mesh
@@ -120,12 +120,17 @@ protected:
 	 */
 	int getWaterPlaneY(float realY);
 
+	/**
+	 * create vertex buffer object
+	 */
 	void createVBO(GLuint* vbo, int size);
-
+	
+	/**
+	 * delete vertex buffer object
+	 */
 	void deleteVBO(GLuint* vbo);
 
 	void createMeshPositionVBO(GLuint *id, int w, int h);
-
 	void createMeshIndexBuffer(GLuint *id, int w, int h);
 
 	//resolution factor
@@ -155,9 +160,6 @@ protected:
 	float stepSize;
 
 	float baseHeight;
-
-
-
 
 	bool showEdges;
 };

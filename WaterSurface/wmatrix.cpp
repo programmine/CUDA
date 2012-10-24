@@ -55,8 +55,6 @@ void WMatrix::printMatrix()
 	for (unsigned int row = 0; row < rowCount; row++){
 
 		for (unsigned int column = 0; column < columnCount; column++){
-
-			//std::cout<<"| "<<Values[column][row];
 		}
 		std::cout << " |" << std::endl;
 	}

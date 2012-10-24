@@ -2,15 +2,17 @@
 #include <windows.h>
 #include <math.h>
 #include <GL/glew.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
 #include <cuda_runtime.h>
 #include <cutil_inline.h>
 #include <cutil_gl_inline.h>
 #include <cuda_gl_interop.h>
 #include <cstdlib>
 #include <iostream> 
-#include "wavemapCUDA.h"
 #include "vector.h"
 #include "waterplaneCUDA.h"
+#include "disturbances.h"
 
 static unsigned long inKB(unsigned long bytes)
 { return bytes/1024; }
@@ -36,7 +38,8 @@ void WaterPlaneCUDA::configure(Vector upperLeft, Vector lowerRight, float dampFa
 
 	cudaSetDevice(cutGetMaxGflopsDeviceId());
 	cudaGLSetGLDevice(cutGetMaxGflopsDeviceId());
-
+	
+	timeSinceLast = timePassed = 0;
 
 	unsigned int free, total;
 	int gpuCount, i;
@@ -135,31 +138,37 @@ void WaterPlaneCUDA::disturbArea(float xmin, float zmin, float xmax, float zmax,
 	if (xmaxW < 0) xmaxW = 0;
 	if (zmaxW < 0) zmaxW = 0;
 
-	glBindBuffer(GL_ARRAY_BUFFER, oldVertexBuffer);
-	float3* verticesTest = (float3*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-
-
-	for(int x = xminW; x <= xmaxW; x++)
-	{
-		for (int y = zminW; y <= zmaxW; y++)
-		{
-			float insideCircle = ((x-centerX)*(x-centerX))+((y-centerZ)*(y-centerZ))-r2;
-
-			if (insideCircle <= 0) {
-				int vIndex = (y * pointsX) + x;
-				if (vIndex < (pointsX*pointsY)) {
-					verticesTest[vIndex].y = (insideCircle/r2)*height;
-				}
-			}
-		} 
-	}
-	glUnmapBufferARB(GL_ARRAY_BUFFER);
-
-
+	disturbances.push_back(new Disturbances(centerX,centerZ,r2,xminW,zminW,xmaxW,zmaxW,height));
 }
+
 
 void WaterPlaneCUDA::update()
 {
+	glBindBuffer(GL_ARRAY_BUFFER, oldVertexBuffer);
+	float3* verticesTest = (float3*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	
+	for (int i = 0; i < disturbances.size();i++)
+	{
+		Disturbances *dist = disturbances.at(i);
+		for(int x = dist->xminW; x <= dist->xmaxW; x++)
+		{
+			for (int y = dist->zminW; y <= dist->zmaxW; y++)
+			{
+				float insideCircle = ((x-dist->centerX)*(x-dist->centerX))+((y-dist->centerZ)*(y-dist->centerZ))-dist->radiusSQ;
+
+				if (insideCircle <= 0) {
+					int vIndex = (y * pointsX) + x;
+					if (vIndex < (pointsX*pointsY)) {
+						verticesTest[vIndex].y = (insideCircle/dist->radiusSQ)*dist->height;
+					}
+				}
+			} 
+		}
+	}
+	glUnmapBufferARB(GL_ARRAY_BUFFER);
+	disturbances.clear();
+
+	
 	size_t num_bytes; 
 
 	cutilSafeCall(cudaGraphicsMapResources(1, &cuda_newVertex_resource, 0));
@@ -189,8 +198,6 @@ void WaterPlaneCUDA::update()
 
 void WaterPlaneCUDA::drawMesh()
 {
-
-
 	glEnable(GL_LIGHTING);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	GLfloat mat_color1[] = { 0.2f, 0.6f, 0.9f };
@@ -286,6 +293,7 @@ WaterPlaneCUDA::~WaterPlaneCUDA(){
 	cudaFree(gpu_normals);
 	cudaFree(gpu_newVertices);
 	cudaFree(gpu_oldVertices);
+	disturbances.clear();
 	cutilSafeCall(cudaGraphicsUnregisterResource(cuda_newVertex_resource));
 	cutilSafeCall(cudaGraphicsUnregisterResource(cuda_oldVertex_resource));
 	cutilSafeCall(cudaGraphicsUnregisterResource(cuda_normalsVB_resource));

@@ -19,7 +19,7 @@ __global__ void updateWaveMapGPU2( float3* dev_newWave, float3* dev_oldWave){
 
 
 			float n = 0.0f;
-			int no=1;
+			int no=0;
 			if (x-1 >= 0) {
 				n += dev_oldWave[up].y; 
 				no++;
@@ -39,7 +39,7 @@ __global__ void updateWaveMapGPU2( float3* dev_newWave, float3* dev_oldWave){
 			
 			n = n/(float)no;
 			n = (n*2) - dev_newWave[tid].y;
-			n = n - ((n/32.0f)*0.3);
+			n = n - ((n/32.0f));
 			dev_newWave[tid].y = n;
 			tid += gridDim.x*blockDim.x;
 		}

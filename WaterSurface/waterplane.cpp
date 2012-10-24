@@ -33,33 +33,16 @@ void WaterPlane::configure(Vector upperLeft, Vector lowerRight, float dampFactor
 {
 
 	stepSize = 1.0f/resolution;
-
 	resolutionFactor = resolution;
-
-	//reale Z - Achse ist x - Achse der WaterPlane
 	sizeX = (int) abs(upperLeft.z - lowerRight.z);
-
-	//reale X -Achse ist y- Achse der WaterPlane
 	sizeY = (int) abs(upperLeft.x - lowerRight.x);
-
-	//Anzahl der Netzpunkte in X -Richtung
 	pointsX = (int)(sizeX * resolution);
-
-	//Anzahl der Netzpunkte in Y -Richtung
 	pointsY = (int)(sizeY * resolution);
-
 	uLeft = upperLeft;
-
 	lRight = lowerRight;
-
-	//Der "Meeresspiegel"
 	baseHeight = lRight.y;
-
-	//Das Höhenfeld der Waterplane
 	waveMap = new WaveMap(pointsX, pointsY, dampFactor);
-
 	initBuffer();
-
 	drawMesh();
 }
 
@@ -109,11 +92,11 @@ void WaterPlane::createMeshIndexBuffer(GLuint *id, int w, int h)
 
 void WaterPlane::initBuffer()
 {
-	//Start und Endkoordinaten für x-Richtung
+	//start and end coordinates for the x directions
 	float startX = this->uLeft.x;
 	float endX = this->lRight.x;
 
-	//Start und Endkoordinaten für x-Richtung
+	//start and end coordinates for the z directions
 	float startY = this->uLeft.z;
 	float endY = this->lRight.z;
 
@@ -132,11 +115,14 @@ void WaterPlane::initBuffer()
 		}
 	}
 
+	//create vertex buffer for normals and vertices
 	createVBO(&vertexBuffer, pointsX*pointsY*sizeof(float)*3);
 	createVBO(&normalBuffer, pointsX*pointsY*sizeof(float)*3);
+	//create index buffer to draw vertices and normals
 	createMeshIndexBuffer(&indexVertexBuffer, pointsX, pointsY);
 	createMeshIndexBuffer(&indexNormalBuffer, pointsX, pointsY);
 
+	//bind buffer to data
 	glBindBuffer(GL_ARRAY_BUFFER, *&vertexBuffer);
 	glBufferData( GL_ARRAY_BUFFER, pointsY*pointsX*3*sizeof(float), vertices, GL_DYNAMIC_DRAW);
 
@@ -188,7 +174,7 @@ void WaterPlane::disturbArea(float xmin, float zmin, float xmax, float zmax, flo
 
 void WaterPlane::push(float x, float y, float depth)
 {
-	//Teste ob Punkt innerhalb der WaterPlane liegt:
+	//check whether point is inside water plane
 	if (x > this->uLeft.z && x < this->lRight.z)
 	{
 		if (y > this->uLeft.x && y < this->lRight.x)
@@ -247,7 +233,7 @@ void WaterPlane::update()
 
 		for (int y = 0; y < pointsY; y++){
 
-			//neuer Höhenwert
+			//new height
 			n = waveMap->getHeight(x,y);
 
 			n += this->baseHeight; 

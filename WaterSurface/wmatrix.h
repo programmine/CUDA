@@ -2,39 +2,39 @@
 #define WMATRIX_H
 
 /**
- * Behelfsklasse für Matrizen belieber Größe.
+ * Helper class matrix.
  */
 class WMatrix
 {
 public:
 
 	/**
-	 * Der Konstruktor
+	 * constructor
 	 */
 	WMatrix(unsigned int columns, unsigned int rows);
 
 	/**
-	 * Gibt den Wert des jeweiligen Elements zurück.
+	 * get value of the element with the given coordinates.
 	 */
 	virtual float getElement(int column, int row);
 
 	/**
-	 * Setzt den Wert des jeweiligen Elements zurück.
+	 * set value of the element with the given coordinates.
 	 */
 	virtual void setElement(int column, int row, float value);
 
 	/**
-	 * Die Größe der Matrix.
+	 * size of the Matrix.
 	 */
 	virtual int getSize(void);
 
 	/**
-	 * Anzahl der Zeilen.
+	 * row count
 	 */
 	virtual int getRowCount(void);
 
 	/**
-	 * Anzahl der Spalten.
+	 * column count
 	 */
 	virtual int getColumnCount(void);
 

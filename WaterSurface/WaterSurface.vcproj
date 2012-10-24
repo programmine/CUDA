@@ -241,15 +241,7 @@
 				Name="water"
 				>
 				<File
-					RelativePath=".\triangle.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\trianglelist.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\trianglelistCUDA.cpp"
+					RelativePath=".\disturbances.cpp"
 					>
 				</File>
 				<File
@@ -262,10 +254,6 @@
 				</File>
 				<File
 					RelativePath=".\wavemap.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\wavemapCUDA.cpp"
 					>
 				</File>
 				<File
@@ -339,15 +327,7 @@
 				Name="water"
 				>
 				<File
-					RelativePath=".\triangle.h"
-					>
-				</File>
-				<File
-					RelativePath=".\trianglelist.h"
-					>
-				</File>
-				<File
-					RelativePath=".\trianglelistCUDA.h"
+					RelativePath=".\disturbances.h"
 					>
 				</File>
 				<File
@@ -360,10 +340,6 @@
 				</File>
 				<File
 					RelativePath=".\wavemap.h"
-					>
-				</File>
-				<File
-					RelativePath=".\wavemapCUDA.h"
 					>
 				</File>
 				<File
