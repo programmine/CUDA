@@ -225,7 +225,7 @@ void WaterPlane::update()
 
 	int nIndex = 0;
 
-	
+	//updates heights
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vertexBuffer);
 	Vector* vertices2 = (Vector*)glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
 
@@ -233,13 +233,9 @@ void WaterPlane::update()
 
 		for (int y = 0; y < pointsY; y++){
 
-			//new height
 			n = waveMap->getHeight(x,y);
-
 			n += this->baseHeight; 
-
 			vIndex = (y * pointsX) + x;
-
 			Vector v = vertices2[vIndex];
 			v.y = n;
 			vertices2[vIndex] = v;
@@ -247,6 +243,7 @@ void WaterPlane::update()
 	}
 	glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
 
+	// updates normals
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, normalBuffer);
 	Vector* normals2 = (Vector*)glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
 

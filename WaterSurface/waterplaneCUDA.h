@@ -20,19 +20,15 @@ class Disturbances;
 class WaterPlaneCUDA : public WaterPlane
 {
 public:
-	/**
-	 * creates the next wave state
-	 */
+
+	/// creates the next wave state
 	virtual void update(void);
 
-	/**
-	 * draws mesh
-	 */
+
+	/// draws mesh
 	virtual void drawMesh(void);
 
-	/**
-	 * returns instance of WaterPlaneCUDA
-	 */
+	/// returns instance of WaterPlaneCUDA
 	static WaterPlane* getWaterPlane();
 
 	/**
@@ -62,9 +58,7 @@ public:
 
 protected:
 	WaterPlaneCUDA();
-	/**
-	 * initialises the basic data structure
-	 */
+	/// initialises the basic data structure
 	void initBuffer(void);
 
 	struct cudaGraphicsResource *cuda_newVertex_resource, *cuda_oldVertex_resource, *cuda_normalsVB_resource; // handles OpenGL-CUDA exchange

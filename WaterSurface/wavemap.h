@@ -4,53 +4,38 @@
 class WMatrix;
 
 /**
- * Das Höhenfeld der WaterPlane.
+ * the height field of the water plane
  *
- * Zur Berechnung der Höhenfeldwerttveränderungen werden zwei 
- * Exemplare der Klasse: WMatrix benötgt um den DoubleBuffer - Mechanismus zu realisieren.
- * So kann der alte Zustand (Belegung der Höhenfelder) gehalten werden
- * um auf von diesem Zustand ausgehend die neue Belegung der Höhenfelder 
- * zu berechnen. Für den nächsten Schritt tauschen die Buffer die Rollen.
+ * for the water surface simulation two buffers are needed
+ * they are updated depending on the previous wave state and damping
+ * after the update the two buffers are swapped
+ * 
  */
 class WaveMap
 {
 public:
 
-	/**
-	 * Erzeugt eine neue WaveMap mit der Ausdehnung pX * pY und einem damp - Factor.
-	 * Dieser wird für die Berechnung der Welle bzw. deren Ausdehnung herangezogen.
-	 */
+
+	/// creates wave map px * py and a damping factor which is needed for the wave expansion
 	WaveMap(int pX, int pY, float damp);
 	WaveMap();
 
-	/**
-	 * Vertauscht die beiden Buffer in ihrer Rolle.
-	 */
+	/// swap two buffers
 	void swap();
 
-	/**
-	 * Verhändert den Höhenwert um an der Stelle (x,y).
-	 */
+	/// changes height value at position (x,y).
 	void push(int x, int y, float value);
 
-	/**
-	 * Berechnet die aktuelle Höhenfledbelegung
-	 */
+	/// calculates current height field
 	virtual void updateWaveMap();
 
-	/**
-	 * Anzahl der Punkte in X - Richtung
-	 */
+	/// number of points along the x axis
 	int getPointsX();
 
-	/**
-	 * Anzahl der Punkte in Y - Richtung
-	 */
+	/// number of points along the y axis
 	int getPointsY();
 
-	/** 
-	 * Höhenwert an Stelle (x,y)
-	 */
+	/// height at position (x,y)
 	virtual float getHeight(int x, int y);
 
 	virtual ~WaveMap(void);

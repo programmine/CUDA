@@ -13,7 +13,7 @@ class RenderWidget : public QGLWidget
 {
 	Q_OBJECT
 public:
-	RenderWidget(QWidget * parent = 0);
+	RenderWidget(bool cudaEnabled, int resolutionLevel);
 	~RenderWidget(void);
 	// functions called by watersurface.cpp from GUI
 	void changeWaveSettings(float waveSize, float waveIntensity);
@@ -67,10 +67,14 @@ private:
 	float waveSize;
 	bool clicked;
 	int waterMode;
-	void drawAxis();
-	void printw(float x, float y, float z, char* format, float fps);
+	bool cudaEnabled;
+	/// returns current fps and emits signal for ui to display fps
 	float getFPS(void);
+	/// called to disturb surface
+	/// given 2D coordinate is transformed into 3D position and projected on water plane
 	void mouseDisturbSurface(QPoint);
+	/// function used to apply water mode (normal or rain)
 	void applyWaterMode();
+	QTimer *timer;
 	
 };

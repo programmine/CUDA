@@ -80,7 +80,7 @@
 				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;"
 				IgnoreDefaultLibraryNames="libcpmt.lib;libcmt.lib"
 				GenerateDebugInformation="false"
-				SubSystem="1"
+				SubSystem="2"
 			/>
 			<Tool
 				Name="VCALinkTool"

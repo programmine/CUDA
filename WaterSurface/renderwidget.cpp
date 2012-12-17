@@ -14,8 +14,8 @@
 #include <time.h>
 
 
-RenderWidget::RenderWidget(QWidget * parent)
-: QGLWidget(parent) 
+RenderWidget::RenderWidget(bool cudaEnabled, int resolutionLevel)
+: QGLWidget() 
 {
 	QGLFormat newFormat;
 	newFormat.setSampleBuffers(true);
@@ -41,7 +41,14 @@ RenderWidget::RenderWidget(QWidget * parent)
 	disturbAreaMin = 1.30f;
 	disturbAreaMax = 1.60f;
 	disturbHeight = 0.1f;
-	resolution = 32.0f;
+
+	// parameter controls resolution
+	if (resolutionLevel == 1) resolution = 32.0f;
+	else resolution = 64.0f;
+	
+	//and whether to use CUDA or not
+	this->cudaEnabled = cudaEnabled;
+	
 	damping = 16;
 	surfaceSize = 5.0;
 	waveSize = 0.1;
@@ -87,42 +94,6 @@ float RenderWidget::getFPS(void)
 	}
 	emit frameCounterChanged(fps);
 	return timeInterval;
-}
-
-
-void RenderWidget::printw (float x, float y, float z, char* format, float fps)
-{
-	va_list args;	//  Variable argument list
-	int len;		//	String length
-	int i;			//  Iterator
-	char * text;	//	Text
-
-	GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_24;
-	//  Initialize a variable argument list
-	va_start(args, format);
-
-	//  Return the number of characters in the string referenced the list of arguments.
-	//  _vscprintf doesn't count terminating '\0' (that's why +1)
-	len = _vscprintf(format, args) + 1; 
-
-	//  Allocate memory for a string of the specified size
-	text = (char *)malloc(len * sizeof(char));
-
-	//  Write formatted output using a pointer to the list of arguments
-	vsprintf_s(text, len, format, args);
-
-	//  End using variable argument list 
-	va_end(args);
-
-	//  Specify the raster position for pixel operations.
-	glRasterPos3f (x, y, z);
-
-	//  Draw the characters one by one
-	for (i = 0; text[i] != '\0'; i++)
-		glutBitmapCharacter(font_style, text[i]);
-
-	//  Free the allocated memory for the string
-	free(text);
 }
 
 void RenderWidget::mouseDisturbSurface(QPoint lastPos)
@@ -264,30 +235,6 @@ void RenderWidget::resizeGL(int w, int h)
 	
 }
 
-void RenderWidget::drawAxis()
-{
-	glScalef(10.0, 10.0, 10.0);
-	glColor3f(1.0, 0.0, 0.0);
-	glBegin(GL_LINES);
-		glVertex3f(0.0f,0.0f,0.0f);
-		glVertex3f(1.0f,0.0f,0.0f);
-	glEnd();
-
-	glColor3f(0.0, 1.0, 0.0);
-	glBegin(GL_LINES);
-		glVertex3f(0.0f,0.0f,0.0f);
-		glVertex3f(0.0f,1.0f,0.0f);
-	glEnd();
-
-	glColor3f(0.0, 0.0, 1.0);
-	glBegin(GL_LINES);
-		glVertex3f(0.0f,0.0f,0.0f);
-		glVertex3f(0.0f,0.0f,1.0f);
-	glEnd();
-	glScalef(0.1, 0.1, 0.1);
-
-}
-
 void RenderWidget::applyWaterMode(){
 	float xPos = 0;
 	float zPos = 0;
@@ -332,7 +279,8 @@ void RenderWidget::initializeGL()
 	initializeLights();
 	glewInit();
 
-	waterplane=WaterPlane::getWaterPlane();
+	if (this->cudaEnabled) waterplane=WaterPlaneCUDA::getWaterPlane();
+	else waterplane=WaterPlane::getWaterPlane();
 	waterplane->configure(Vector(0,0,0),Vector(surfaceSize,0,surfaceSize),damping,resolution);
 	waterplane->update();
 }

@@ -80,57 +80,38 @@ private:
 
 protected:
 
-	/**
-	 * Standard constructor
-	 */
+	/// Standard constructor
 	WaterPlane();
 
-	/**
-	 * The WaterPlane Instance
-	 */
+	/// The WaterPlane Instance
 	static WaterPlane* WaterPlaneExemplar;
 
-	/** 
-	 * Swaps the roles of the two buffers between old and new wave state
-	 */
+	/// Swaps the roles of the two buffers between old and new wave state
 	void swapBuffers(void);
 
-	/**
-	 * Sets the height value of the given x,y (x,z) to the given depth
-	 */
+	/// Sets the height value of the given x,y (x,z) to the given depth
 	void push(float x, float y, float depth);
 
-	/**
-	 * initialises the basic data structure
-	 */
+	/// initialises the basic data structure
 	void initBuffer(void);
 
-	/**
-	 * height on the position (x,y).
-	 */
+	/// height on the position (x,y).
 	int getHeight(int x, int y);
 
-	/**
-	 * calculates the water surface x point from the world coordinates of realX
-	 */
+	/// calculates the water surface x point from the world coordinates of realX
 	int getWaterPlaneX(float realX);
 
-	/**
-	 * calculates the water surface point y from the world coordinates of realY
-	 */
+	/// calculates the water surface point y from the world coordinates of realY
 	int getWaterPlaneY(float realY);
 
-	/**
-	 * create vertex buffer object
-	 */
+	
+	/// create vertex buffer object
 	void createVBO(GLuint* vbo, int size);
 	
-	/**
-	 * delete vertex buffer object
-	 */
+	/// delete vertex buffer object
 	void deleteVBO(GLuint* vbo);
 
-	void createMeshPositionVBO(GLuint *id, int w, int h);
+	/// create vertex buffer object of indices for triangle mesh
 	void createMeshIndexBuffer(GLuint *id, int w, int h);
 
 	//resolution factor

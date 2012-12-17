@@ -8,10 +8,10 @@
 #include <QtGui/QDoubleSpinBox>
 #include <iostream>
 
-WaterSurface::WaterSurface(QWidget *parent, Qt::WFlags flags)
-	: QMainWindow(parent, flags)
+WaterSurface::WaterSurface(bool cudaEnabled, int resolutionLevel)
+	: QMainWindow()
 {
-	renderWidget = new RenderWidget();
+	renderWidget = new RenderWidget(cudaEnabled,resolutionLevel);
 	centralWidget = new QWidget();
 	QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
 	QGridLayout *controlLayout = new QGridLayout();
@@ -43,7 +43,7 @@ WaterSurface::WaterSurface(QWidget *parent, Qt::WFlags flags)
 
 	framecounter = new QLabel("FPS");
 	QObject::connect(renderWidget, SIGNAL(frameCounterChanged(float)),this, SLOT(setFrameCounter(float)));
-
+	framecounter->setFixedWidth(100);
 	mode = new QComboBox();
 	mode->insertItem(0, "Normal");
 	mode->insertItem(1, "Rain");
@@ -53,11 +53,11 @@ WaterSurface::WaterSurface(QWidget *parent, Qt::WFlags flags)
 	controlLayout->addWidget(checkbox,1,3);
 	controlLayout->addWidget(new QLabel("Water Mode"),2,3);
 	controlLayout->addWidget(mode,2,4);
-	controlLayout->addWidget(reset,3,1);
-	controlLayout->addWidget(framecounter,3,2);
+	//controlLayout->addWidget(reset,3,2);
+	controlLayout->addWidget(framecounter,3,1);
 	setCentralWidget(centralWidget);
-	mainLayout->addLayout(controlLayout,3);
-	mainLayout->addWidget(renderWidget,3);  
+	mainLayout->addLayout(controlLayout,0);
+	mainLayout->addWidget(renderWidget,1);  
 	mainLayout->addWidget(new QLabel("To change camera use CTRL + left/right mouse button"),0); 
 	setWindowTitle(tr("Water Surface"));
 	resize(1044,800);

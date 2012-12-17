@@ -14,13 +14,12 @@ class WaterSurface : public QMainWindow
 	Q_OBJECT
 
 public:
-	WaterSurface(QWidget *parent = 0, Qt::WFlags flags = 0);
+	WaterSurface(bool cudaEnabled, int resolutionLevel);
 	~WaterSurface();
 
 
 
 protected slots:
-	//slots for GUI elements
 	void changeWaveSettingsSize(double);
 	void changeWaveSettingsIntens(double);
 	void resetWaveSettings();
